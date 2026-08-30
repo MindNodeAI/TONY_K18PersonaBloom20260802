@@ -8,9 +8,8 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <script src="https://unpkg.com/docx@8.5.0/build/index.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
     
+    <!-- 引入 Firebase 相容套件 -->
     <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.13.1/firebase-firestore-compat.js"></script>
@@ -19,7 +18,7 @@
     <style>
         body { font-family: 'Inter', 'Noto Sans TC', sans-serif; background-color: #f8fafc; }
         .fade-in { animation: fadeIn 0.3s ease-in-out; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(5px); } to { opacity: 1; transform: translateY(0); } }
         #q-loading-text, #res-ai-loading-text { transition: opacity 0.4s ease-in-out; }
         
         .prose h1, .prose h2, .prose h3 { font-weight: bold; margin-top: 1.5em; margin-bottom: 0.5em; color: #1e293b; }
@@ -38,8 +37,9 @@
 
     <header class="bg-white shadow-sm sticky top-0 z-40">
         <div class="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
-            <div class="flex items-center gap-2 cursor-pointer" onclick="App.navigate('dashboard')">
-                <i class="ph-fill ph-flower-lotus text-rose-500 text-3xl"></i>
+            <div class="flex items-center gap-3 cursor-pointer" onclick="App.navigate('dashboard')">
+                <img src="https://firebasestorage.googleapis.com/v0/b/k16-tony-ai-wisdom-platform.firebasestorage.app/o/assets%2F6av64EOvvqQNAIoXqcPfHC5BBeF3%2F1788065457616_%E6%9C%AA%E5%91%BD%E5%90%8D%E8%A8%AD%E8%A8%88%20(2).png?alt=media&token=1c1cf9cf-7948-490a-b9d8-5fd9671b3bae" alt="TONY STUDIO" class="h-8 object-contain">
+                <div class="w-px h-6 bg-slate-200"></div>
                 <span class="font-bold text-xl tracking-tight text-slate-800">Persona Bloom</span>
             </div>
             <div id="nav-user-section" class="flex items-center gap-4 hidden">
@@ -47,7 +47,7 @@
                     <div id="nav-user-name" class="font-bold text-slate-700"></div>
                     <div id="nav-user-role" class="text-slate-400 text-xs"></div>
                 </div>
-                <button onclick="App.logout()" class="p-2 text-slate-500 hover:text-slate-800 hover:bg-slate-100 rounded-full transition">
+                <button onclick="App.logout()" class="p-2 text-slate-500 hover:text-rose-600 hover:bg-rose-50 rounded-full transition" title="登出">
                     <i class="ph ph-sign-out text-xl"></i>
                 </button>
             </div>
@@ -59,7 +59,7 @@
         <div id="view-auth" class="max-w-md mx-auto bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden mt-10">
             <div class="p-8">
                 <div class="text-center mb-8">
-                    <i class="ph-fill ph-flower-lotus text-rose-500 text-5xl mb-3"></i>
+                    <img src="https://firebasestorage.googleapis.com/v0/b/k16-tony-ai-wisdom-platform.firebasestorage.app/o/assets%2F6av64EOvvqQNAIoXqcPfHC5BBeF3%2F1788065457616_%E6%9C%AA%E5%91%BD%E5%90%8D%E8%A8%AD%E8%A8%88%20(2).png?alt=media&token=1c1cf9cf-7948-490a-b9d8-5fd9671b3bae" alt="TONY STUDIO" class="w-64 sm:w-80 mx-auto mb-8 object-contain">
                     <h2 class="text-2xl font-bold text-slate-800 mb-2">歡迎來到 Persona Bloom</h2>
                     <p class="text-slate-500 text-sm">三重意象人格探索，發現更深層的自己</p>
                 </div>
@@ -73,9 +73,8 @@
                         <div>
                             <div class="flex justify-between items-center mb-1">
                                 <label class="block text-sm font-medium text-slate-700">密碼</label>
-                                <a href="#" onclick="App.forgotPassword()" class="text-xs text-rose-600 hover:underline">忘記密碼？</a>
                             </div>
-                            <input type="password" id="login-password" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-rose-500" placeholder="輸入密碼">
+                            <input type="password" id="login-password" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-rose-500" placeholder="輸入密碼" onkeypress="if(event.key==='Enter') App.login()">
                         </div>
                         <button onclick="App.login()" class="w-full py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition shadow-md">登入</button>
                     </div>
@@ -101,11 +100,11 @@
                         <div class="bg-yellow-50 border border-yellow-200 rounded-xl p-4 text-sm text-yellow-800 flex items-start gap-3 mt-4">
                             <i class="ph-fill ph-warning-circle text-2xl mt-0.5 text-yellow-500 shrink-0"></i>
                             <div>
-                                <p class="font-bold mb-1">溫馨提醒：驗證信防漏接！</p>
-                                <p class="leading-relaxed">註冊信有時會跑到<strong class="text-rose-600">「垃圾郵件匣」</strong>，請前往點擊驗證連結才能登入！</p>
+                                <p class="font-bold mb-1">防漏信提醒！</p>
+                                <p class="leading-relaxed">註冊驗證信有時會跑到<strong class="text-rose-600">「垃圾郵件匣」</strong>，請務必點擊驗證連結才能登入。</p>
                             </div>
                         </div>
-                        <button onclick="App.register()" class="w-full py-3 bg-rose-600 text-white rounded-xl font-bold hover:bg-rose-700 transition shadow-md mt-2">建立帳號並發送驗證信</button>
+                        <button onclick="App.register()" class="w-full py-3 bg-rose-600 text-white rounded-xl font-bold hover:bg-rose-700 transition shadow-md mt-2">建立帳號</button>
                     </div>
                     <div class="mt-6 text-center text-sm text-slate-500">
                         已有帳號？ <a href="#" onclick="App.toggleAuthMode('login')" class="text-slate-900 font-bold hover:underline">返回登入</a>
@@ -122,10 +121,10 @@
                     </div>
                     <div class="flex-grow">
                         <h3 class="font-bold text-lg mb-1">您的 Gemini API Key</h3>
-                        <p class="text-sm text-slate-500 mb-4">輸入您自有的 API Key 以解鎖 AI 專業報告與圖像生成。我們不會儲存您的金鑰。</p>
+                        <p class="text-sm text-slate-500 mb-4">系統升級採用最新 <strong>Gemini 3.7 Flash</strong>。請輸入您的金鑰以解鎖分析。</p>
                         <div class="flex gap-2">
-                            <input type="password" id="api-key-input" class="flex-grow px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none focus:border-blue-500" placeholder="AIzaSy...">
-                            <button onclick="App.saveApiKey()" class="px-5 py-2 bg-slate-900 text-white rounded-lg font-medium hover:bg-slate-800 transition whitespace-nowrap">套用</button>
+                            <input type="password" id="api-key-input" class="flex-grow px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm" placeholder="AIzaSy...">
+                            <button onclick="App.saveApiKey()" class="px-6 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition whitespace-nowrap shadow-sm">套用</button>
                         </div>
                     </div>
                 </div>
@@ -135,13 +134,21 @@
                 <div onclick="App.navigate('task-form')" class="bg-gradient-to-br from-rose-500 to-orange-500 p-6 rounded-2xl shadow-md text-white cursor-pointer hover:shadow-lg transition transform hover:-translate-y-1">
                     <i class="ph ph-sparkle text-3xl mb-3 block"></i>
                     <h3 class="text-xl font-bold mb-1">開始新的意象探索</h3>
-                    <p class="text-rose-100 text-sm">AI 將根據您的目標，動態決定最適合的測驗長度。</p>
+                    <p class="text-rose-100 text-sm">AI 將根據您的目標，為您動態量身打造情境測驗。</p>
                 </div>
                 <div onclick="App.navigate('history')" class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 cursor-pointer hover:border-blue-200 transition">
-                    <i class="ph ph-clock-counter-clockwise text-3xl text-blue-500 mb-3 block"></i>
+                    <i class="ph ph-books text-3xl text-blue-500 mb-3 block"></i>
                     <h3 class="text-xl font-bold text-slate-800 mb-1">歷史紀錄</h3>
-                    <p class="text-slate-500 text-sm">回顧、審視您過去的所有分析與生圖。</p>
+                    <p class="text-slate-500 text-sm">回顧、審視並管理您過去的所有報告。</p>
                 </div>
+            </div>
+
+            <div onclick="App.navigate('guide')" class="bg-gradient-to-r from-teal-500 to-emerald-500 p-6 rounded-2xl shadow-sm text-white cursor-pointer hover:shadow-md transition transform hover:-translate-y-1 flex items-center justify-between">
+                <div>
+                    <h3 class="text-xl font-bold mb-1 flex items-center gap-2"><i class="ph-fill ph-book-open text-2xl"></i>系統白皮書與使用說明</h3>
+                    <p class="text-teal-50 text-sm">了解 Persona Bloom 背後的心理學理論、框架與圖表設計指南。</p>
+                </div>
+                <i class="ph ph-caret-right text-2xl opacity-80"></i>
             </div>
 
             <div id="admin-entrance" class="hidden">
@@ -153,73 +160,112 @@
                     <i class="ph ph-caret-right"></i>
                 </div>
             </div>
+
+            <!-- TONY 顧問簡介區塊 -->
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 overflow-hidden mt-8">
+                <div class="p-6 sm:p-8 md:flex items-start gap-8">
+                    <div class="shrink-0 mb-6 md:mb-0 flex flex-col items-center md:items-start">
+                        <div class="w-32 h-32 md:w-40 md:h-40 rounded-2xl overflow-hidden shadow-md ring-4 ring-slate-50 relative group">
+                            <img src="https://firebasestorage.googleapis.com/v0/b/k16-tony-ai-wisdom-platform.firebasestorage.app/o/assets%2F6av64EOvvqQNAIoXqcPfHC5BBeF3%2F1787580326393_ChatGPT%20Image%202026%E5%B9%B46%E6%9C%8819%E6%97%A5%20%E4%B8%8A%E5%8D%8811_16_14.png?alt=media&token=3c85de41-f36f-46e5-a97a-7bc7eb83a027" alt="TONY 楊文澤" class="w-full h-full object-cover transition duration-500 group-hover:scale-110">
+                        </div>
+                        <div class="mt-4 text-center md:text-left">
+                            <h3 class="text-xl font-bold text-slate-800">TONY 楊文澤 老師</h3>
+                            <p class="text-sm text-slate-500 font-medium mt-1">資深數位行銷科技顧問</p>
+                            <p class="text-sm text-slate-500 font-medium">生成式 AI 創作者 / 創業導師</p>
+                        </div>
+                    </div>
+                    <div class="flex-grow space-y-6">
+                        <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5"><i class="ph-fill ph-briefcase text-slate-300 text-lg"></i> 現職 Current</h4>
+                                <ul class="text-sm text-slate-600 space-y-2">
+                                    <li class="flex items-start gap-2"><span class="text-rose-500 font-bold mt-0.5">▪</span> 龍華科大 數位行銷講師</li>
+                                    <li class="flex items-start gap-2"><span class="text-rose-500 font-bold mt-0.5">▪</span> 智策慧 品牌行銷科技顧問</li>
+                                </ul>
+                            </div>
+                            <div>
+                                <h4 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5"><i class="ph-fill ph-graduation-cap text-slate-300 text-lg"></i> 學歷 Education</h4>
+                                <ul class="text-sm text-slate-600 space-y-2">
+                                    <li class="flex items-start gap-2"><span class="text-blue-500 font-bold mt-0.5">▪</span> 台大 EMBA 商學組</li>
+                                    <li class="flex items-start gap-2"><span class="text-blue-500 font-bold mt-0.5">▪</span> 美國 Arizona State University 互動多媒體設計</li>
+                                    <li class="flex items-start gap-2"><span class="text-blue-500 font-bold mt-0.5">▪</span> 北科大 工業設計</li>
+                                </ul>
+                            </div>
+                        </div>
+                        
+                        <div>
+                            <h4 class="text-sm font-bold text-slate-400 uppercase tracking-wider mb-3 flex items-center gap-1.5"><i class="ph-fill ph-star text-slate-300 text-lg"></i> 經歷 Experience</h4>
+                            <ul class="text-sm text-slate-600 space-y-2 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+                                <li class="flex items-start gap-2"><span class="text-amber-500 font-bold mt-0.5">▪</span> 脈動心聯股份有限公司 創辦人暨執行長</li>
+                                <li class="flex items-start gap-2"><span class="text-amber-500 font-bold mt-0.5">▪</span> 宏碁集團建碁 AOPEN 處長 / 全球品牌行銷總監 / 發言人</li>
+                                <li class="flex items-start gap-2 col-span-1 sm:col-span-2"><span class="text-amber-500 font-bold mt-0.5">▪</span> 台灣數位看板多媒體聯盟 (DSMA) 副會長</li>
+                            </ul>
+                        </div>
+                        
+                        <div class="bg-slate-50 p-5 rounded-xl border border-slate-100">
+                            <h4 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-1.5"><i class="ph-fill ph-chalkboard-teacher text-emerald-500 text-lg"></i> 專家授課經歷</h4>
+                            <ul class="text-sm text-slate-600 space-y-2 grid grid-cols-1 sm:grid-cols-2 gap-x-4 gap-y-2">
+                                <li class="flex items-start gap-2"><span class="text-emerald-500 font-bold mt-0.5">▪</span> CPC 生產力中心 經營管理顧問師班 / 中小企業成長創價能量 講師</li>
+                                <li class="flex items-start gap-2"><span class="text-emerald-500 font-bold mt-0.5">▪</span> 台大 EMBA / 長榮 EMBA / 北科大 / 政大 / 世新 業師</li>
+                                <li class="flex items-start gap-2"><span class="text-emerald-500 font-bold mt-0.5">▪</span> 2021 MarTech 行銷科技行銷長認證班 講師</li>
+                                <li class="flex items-start gap-2"><span class="text-emerald-500 font-bold mt-0.5">▪</span> 2021/2024/2025 T大使與產業尖兵 講師</li>
+                                <li class="flex items-start gap-2"><span class="text-emerald-500 font-bold mt-0.5">▪</span> 2025 新光人壽 AI 工具應用 企業內訓講師</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
         </div>
 
         <div id="view-task-form" class="hidden fade-in max-w-2xl mx-auto">
-            <button onclick="App.navigate('dashboard')" class="mb-4 text-slate-500 hover:text-slate-800 flex items-center gap-1 font-medium"><i class="ph ph-arrow-left"></i>返回</button>
+            <button onclick="App.navigate('dashboard')" class="mb-4 text-slate-500 hover:text-slate-800 flex items-center gap-1 font-medium transition"><i class="ph ph-arrow-left"></i>返回首頁</button>
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sm:p-8">
                 <h2 class="text-2xl font-bold mb-6 flex items-center gap-2"><i class="ph-fill ph-plant text-rose-500"></i>建立探索任務</h2>
                 
                 <div class="space-y-5">
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-1">任務名稱</label>
-                        <input type="text" id="task-title" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none" value="我的三重意象分析">
+                        <input type="text" id="task-title" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-rose-500" value="我的三重意象分析">
                     </div>
                     
                     <div class="grid grid-cols-2 gap-4">
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-1">分析對象</label>
-                            <select id="task-target" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none"><option value="self">我自己</option><option value="other">其他人</option></select>
+                            <select id="task-target" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-rose-500"><option value="self">我自己</option><option value="other">其他人</option></select>
                         </div>
                         <div>
                             <label class="block text-sm font-bold text-slate-700 mb-1">探索目的</label>
-                            <select id="task-purpose" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none"><option value="self-discovery">自我探索</option><option value="career">職涯發展</option><option value="relationship">人際溝通</option><option value="branding">個人品牌</option></select>
+                            <select id="task-purpose" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-rose-500"><option value="self-discovery">自我探索</option><option value="career">職涯發展</option><option value="relationship">人際溝通</option><option value="branding">個人品牌</option></select>
                         </div>
                     </div>
 
-                    <!-- 新增：測驗長度與深度選擇 -->
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-1">測驗深度與長度偏好</label>
-                        <select id="task-depth" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none text-sm text-slate-700">
-                            <option value="dynamic">🤖 讓 AI 根據我的情境判斷 (推薦，可能 5~15 題)</option>
-                            <option value="quick">⚡ 快速測驗 (適合時間有限，約 5-8 題)</option>
-                            <option value="standard">🎯 標準測驗 (取得平衡，約 10-12 題)</option>
-                            <option value="deep">🧠 深度測驗 (適合全面剖析，約 15 題以上)</option>
+                        <select id="task-depth" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-rose-500 text-sm">
+                            <option value="dynamic">🤖 讓 AI 根據情境判斷 (彈性配題)</option>
+                            <option value="quick">⚡ 快速測驗 (適合時間有限)</option>
+                            <option value="standard">🎯 標準測驗 (精準平衡)</option>
+                            <option value="deep">🧠 深度測驗 (全面剖析)</option>
                         </select>
-                        <p class="text-xs text-slate-400 mt-1">越複雜的情境與探索目的，需要越多的題目來精準定位維度。</p>
-                    </div>
-
-                    <div>
-                        <label class="block text-sm font-bold text-slate-700 mb-1">題庫探索模式</label>
-                        <div class="grid grid-cols-2 gap-3">
-                            <label class="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-rose-50 transition">
-                                <input type="radio" name="question-mode" value="ai" checked class="accent-rose-500">
-                                <div><div class="text-sm font-bold text-slate-800 flex items-center gap-1"><i class="ph-fill ph-sparkle text-rose-500"></i>AI 客製出題</div><div class="text-xs text-slate-400">根據背景客製題庫</div></div>
-                            </label>
-                            <label class="flex items-center gap-2 p-3 bg-slate-50 border border-slate-200 rounded-xl cursor-pointer hover:bg-rose-50 transition">
-                                <input type="radio" name="question-mode" value="standard" class="accent-rose-500">
-                                <div><div class="text-sm font-bold text-slate-800">標準經典題庫</div><div class="text-xs text-slate-400">固定 12 題情境測驗</div></div>
-                            </label>
-                        </div>
                     </div>
 
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-1">自我介紹與背景補充 (選填)</label>
-                        <textarea id="task-bg" rows="3" class="w-full px-4 py-2 bg-slate-50 border border-slate-200 rounded-lg outline-none resize-none" placeholder="描述目前的狀態或面臨的情境，AI 將據此調整測驗重點..."></textarea>
+                        <textarea id="task-bg" rows="3" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-rose-500 resize-none text-sm" placeholder="描述目前的狀態或面臨的情境，AI 將據此為您量身打造測驗情境..."></textarea>
                     </div>
 
                     <div>
                         <label class="block text-sm font-bold text-slate-700 mb-2">上傳參考資料 (選填，最多 5 個，單檔上限 15MB)</label>
-                        <div class="relative border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:bg-slate-50 transition cursor-pointer group">
+                        <div class="relative border-2 border-dashed border-slate-300 rounded-xl p-6 text-center hover:bg-slate-50 hover:border-rose-400 transition cursor-pointer group">
                             <input type="file" multiple id="file-uploader" onchange="App.handleFileSelect(event)" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" title="上傳檔案">
                             <i class="ph ph-upload-simple text-3xl text-slate-400 group-hover:text-rose-500 mb-2 block transition-colors"></i>
                             <p class="text-sm text-slate-600 font-medium">點擊選取或拖曳檔案至此</p>
-                            <p class="text-xs text-slate-400 mt-1">支援圖片(自動壓縮)、文件、語音、影片</p>
+                            <p class="text-xs text-slate-400 mt-1">支援圖片(會自動壓縮)、文件、純文字</p>
                         </div>
                         <ul id="file-preview-list" class="mt-3 space-y-2"></ul>
                     </div>
 
-                    <button onclick="App.startQuestionnaire()" class="w-full py-4 mt-2 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition shadow-lg flex items-center justify-center gap-2 text-lg">
+                    <button onclick="App.startQuestionnaire()" class="w-full py-4 mt-4 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition shadow-lg flex items-center justify-center gap-2 text-lg">
                         進入測驗 <i class="ph ph-arrow-right font-bold"></i>
                     </button>
                 </div>
@@ -227,22 +273,22 @@
         </div>
 
         <div id="view-questionnaire" class="hidden fade-in max-w-3xl mx-auto">
-            <div id="q-loading-state" class="hidden bg-white rounded-2xl shadow-sm border border-slate-100 p-12 text-center">
-                <i class="ph ph-sparkle ph-spin text-5xl text-rose-500 mb-4 block mx-auto"></i>
-                <h3 id="q-loading-text" class="text-xl font-bold text-slate-800 mb-2">Gemini 正在分析您的情境...</h3>
-                <p class="text-slate-500 text-sm">正在為您打造個人化的深度情境題庫，請稍候片刻</p>
+            <div id="q-loading-state" class="hidden bg-white rounded-2xl shadow-sm border border-slate-100 p-16 text-center">
+                <i class="ph ph-sparkle ph-spin text-5xl text-rose-500 mb-6 block mx-auto"></i>
+                <h3 id="q-loading-text" class="text-xl font-bold text-slate-800 mb-3">啟動 Gemini 3.7 分析引擎...</h3>
+                <p class="text-slate-500 text-sm">正在根據您的資料量身打造測驗，請稍候片刻</p>
             </div>
 
             <div id="q-error-state" class="hidden bg-white rounded-2xl shadow-sm border border-rose-100 p-8 text-center">
                 <i class="ph-fill ph-warning-circle text-5xl text-rose-500 mb-4 block mx-auto"></i>
-                <h3 class="text-xl font-bold text-slate-800 mb-2">AI 出題遇到阻礙</h3>
+                <h3 class="text-xl font-bold text-slate-800 mb-2">網路或格式異常</h3>
                 <p id="q-error-text" class="text-slate-600 text-sm mb-6"></p>
-                <button onclick="App.fallbackToStandardQuestions()" class="px-6 py-2 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition shadow-md">
-                    切換至標準 12 題庫繼續測驗
+                <button onclick="App.fallbackToStandardQuestions()" class="px-6 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition shadow-md">
+                    切換至標準題庫繼續測驗
                 </button>
             </div>
 
-            <div id="q-content-state" class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sm:p-10 text-center">
+            <div id="q-content-state" class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sm:p-10 text-center hidden">
                 <div class="mb-8">
                     <span class="inline-block px-3 py-1 bg-rose-100 text-rose-700 font-bold rounded-full text-sm mb-4" id="q-progress">第 1 題</span>
                     <h2 class="text-2xl sm:text-3xl font-bold text-slate-800 leading-snug" id="q-text">載入題目中...</h2>
@@ -252,97 +298,103 @@
         </div>
 
         <div id="view-result" class="hidden fade-in max-w-5xl mx-auto">
-            <button onclick="App.navigate('dashboard')" class="mb-4 text-slate-500 hover:text-slate-800 flex items-center gap-1 font-medium"><i class="ph ph-arrow-left"></i>返回首頁</button>
+            <button onclick="App.navigate('dashboard')" class="mb-4 text-slate-500 hover:text-slate-800 flex items-center gap-1 font-medium transition"><i class="ph ph-arrow-left"></i>返回首頁</button>
             
-            <div id="res-ai-loading" class="bg-white rounded-2xl shadow-sm border border-slate-100 p-16 flex flex-col items-center justify-center text-slate-500">
-                <i class="ph ph-spinner-gap ph-spin text-5xl mb-4 text-rose-500"></i>
-                <p id="res-ai-loading-text" class="font-bold text-xl text-slate-800">正在整合您的答題紀錄...</p>
-                <p class="text-sm mt-2">AI 正在深度建構您的三重意象，需要約 15 秒</p>
+            <div id="res-ai-loading" class="bg-white rounded-2xl shadow-sm border border-slate-100 p-20 flex flex-col items-center justify-center text-slate-500 hidden">
+                <i class="ph ph-spinner-gap ph-spin text-5xl mb-6 text-rose-500"></i>
+                <p id="res-ai-loading-text" class="font-bold text-xl text-slate-800 transition-opacity duration-300">正在統整您的作答軌跡...</p>
+                <p class="text-sm mt-3 opacity-70">AI 正在深度建構您的三重意象，約需 10~15 秒</p>
             </div>
 
             <div id="res-error-state" class="hidden bg-white rounded-2xl shadow-sm border border-rose-100 p-12 text-center">
                 <i class="ph-fill ph-warning-circle text-5xl text-rose-500 mb-4 block mx-auto"></i>
-                <h3 class="text-xl font-bold text-slate-800 mb-2">分析過程發生中斷</h3>
+                <h3 class="text-xl font-bold text-slate-800 mb-2">報告產出中斷</h3>
                 <p id="res-error-text" class="text-slate-600 text-sm mb-6"></p>
-                <button onclick="App.generateReport()" class="px-6 py-2 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition shadow-md">
-                    <i class="ph ph-arrows-clockwise mr-1"></i>重新嘗試分析 (保留作答紀錄)
+                <button onclick="App.generateReport()" class="px-6 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition shadow-md">
+                    <i class="ph ph-arrows-clockwise mr-1"></i>重新嘗試分析 (不遺失作答紀錄)
                 </button>
             </div>
 
             <div id="res-main-content" class="grid grid-cols-1 lg:grid-cols-3 gap-6 hidden">
-                <!-- 左側：意象徽章與匯出按鈕 (重新編排) -->
+                <!-- 左側：意象徽章與操作面板 -->
                 <div class="lg:col-span-1 space-y-4">
-                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
-                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-4 border-b border-slate-50 pb-3"><i class="ph-fill ph-sparkle text-rose-400 mr-1"></i>您的三重核心意象</h3>
-                        <div class="space-y-5" id="res-summary-badges"></div>
+                    <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100 relative overflow-hidden">
+                        <div class="absolute top-0 right-0 w-24 h-24 bg-gradient-to-bl from-rose-100 to-transparent rounded-bl-full opacity-50"></div>
+                        <h3 class="text-xs font-bold text-slate-400 uppercase tracking-wider mb-5 border-b border-slate-50 pb-3 flex items-center"><i class="ph-fill ph-sparkle text-rose-400 mr-1 text-lg"></i>您的核心意象</h3>
+                        <div class="space-y-6" id="res-summary-badges"></div>
                     </div>
                     
                     <div class="flex gap-2">
-                        <button onclick="App.generateFBPost()" id="btn-fb-post" class="flex-1 px-4 py-3 bg-blue-600 text-white rounded-xl shadow font-bold text-sm hover:bg-blue-700 transition flex items-center justify-center">
-                            <i class="ph-fill ph-facebook-logo mr-1 text-lg"></i>分享貼文
+                        <button onclick="App.generateFBPost()" id="btn-fb-post" class="flex-1 px-4 py-3.5 bg-blue-600 text-white rounded-xl shadow-sm font-bold text-sm hover:bg-blue-700 transition flex items-center justify-center">
+                            <i class="ph-fill ph-facebook-logo mr-1.5 text-lg"></i>分享貼文
                         </button>
-                        <button onclick="App.downloadDocx()" class="flex-1 px-4 py-3 bg-indigo-600 text-white rounded-xl shadow font-bold text-sm hover:bg-indigo-700 transition flex items-center justify-center">
-                            <i class="ph-fill ph-file-doc mr-1 text-lg"></i>匯出 Word
+                        <button onclick="App.downloadDocx()" class="flex-1 px-4 py-3.5 bg-slate-800 text-white rounded-xl shadow-sm font-bold text-sm hover:bg-slate-700 transition flex items-center justify-center">
+                            <i class="ph-fill ph-file-doc mr-1.5 text-lg"></i>匯出 Word
                         </button>
                     </div>
 
-                    <button onclick="App.generateTTS()" id="btn-tts" class="w-full py-3 bg-teal-600 text-white rounded-xl shadow font-bold text-sm hover:bg-teal-700 transition flex items-center justify-center">
-                        <i class="ph-fill ph-speaker-high mr-2 text-lg"></i>聆聽報告摘要 (AI 語音)
+                    <button onclick="App.generateTTS()" id="btn-tts" class="w-full py-3.5 bg-teal-600 text-white rounded-xl shadow-sm font-bold text-sm hover:bg-teal-700 transition flex items-center justify-center">
+                        <i class="ph-fill ph-speaker-high mr-2 text-lg"></i>聆聽語音摘要
                     </button>
                 </div>
 
                 <!-- 右側：AI 報告與互動區塊 -->
                 <div class="lg:col-span-2">
                     <div class="bg-white p-6 sm:p-8 rounded-2xl shadow-sm border border-slate-100 h-full">
-                        <div id="res-ai-content" class="prose max-w-none"></div>
+                        <div id="res-ai-content" class="prose max-w-none prose-slate prose-headings:text-slate-800"></div>
 
-                        <!-- PROMPT 檢視區塊 (中英雙語對照) -->
-                        <div id="res-prompt-section" class="mt-8 pt-6 border-t border-slate-100">
-                            <h3 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
-                                <i class="ph-fill ph-palette text-purple-500 text-lg"></i> 專屬 AI 生圖提示詞 (自行發揮版)
+                        <!-- 雙語 PROMPT 區塊 -->
+                        <div id="res-prompt-section" class="mt-10 pt-8 border-t border-slate-100">
+                            <h3 class="text-base font-bold text-slate-800 mb-3 flex items-center gap-2">
+                                <i class="ph-fill ph-palette text-purple-500 text-xl"></i> AI 視覺構想與提示詞 (Prompt)
                             </h3>
-                            <p class="text-xs text-slate-500 mb-4">系統已將您的「顏色、動物、植物」完美融合為一個展現您特質的情境。您可以複製以下提示詞至 Midjourney 等繪圖工具中自行生成。</p>
+                            <p class="text-sm text-slate-500 mb-5 leading-relaxed">AI 已將您的意象完美融合。您可以複製下方的英文提示詞，貼至 Midjourney 或其他繪圖工具，親手將您的特質具象化。</p>
                             
                             <div class="space-y-4">
                                 <div class="relative group">
-                                    <label class="block text-xs font-bold text-slate-600 mb-1">💡 中文畫面構想</label>
-                                    <textarea id="prompt-zh" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-sm text-slate-700 h-20 outline-none resize-none" readonly></textarea>
-                                    <button onclick="App.copyText('prompt-zh')" class="absolute top-6 right-2 p-1.5 bg-white rounded-lg shadow-sm border border-slate-200 text-slate-500 hover:text-blue-600 transition text-xs flex items-center gap-1"><i class="ph ph-copy"></i> 複製</button>
+                                    <label class="block text-xs font-bold text-slate-600 mb-1.5">💡 中文視覺構想</label>
+                                    <textarea id="prompt-zh" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-4 text-sm text-slate-700 h-24 outline-none resize-none leading-relaxed" readonly></textarea>
+                                    <button onclick="App.copyText('prompt-zh', true)" class="absolute top-8 right-3 p-2 bg-white rounded-lg shadow-sm border border-slate-200 text-slate-500 hover:text-blue-600 transition text-xs flex items-center gap-1 font-medium"><i class="ph ph-copy"></i> 複製</button>
                                 </div>
                                 <div class="relative group">
-                                    <label class="block text-xs font-bold text-slate-600 mb-1">✨ 英文 AI 提示詞 (Prompt)</label>
-                                    <textarea id="prompt-en" class="w-full bg-slate-50 border border-slate-200 rounded-xl p-3 text-xs text-slate-600 h-24 outline-none resize-none font-mono" readonly></textarea>
-                                    <button onclick="App.copyText('prompt-en')" class="absolute top-6 right-2 p-1.5 bg-white rounded-lg shadow-sm border border-slate-200 text-slate-500 hover:text-blue-600 transition text-xs flex items-center gap-1"><i class="ph ph-copy"></i> 複製</button>
+                                    <label class="block text-xs font-bold text-slate-600 mb-1.5">✨ 英文 AI 提示詞</label>
+                                    <textarea id="prompt-en" class="w-full bg-slate-800 text-slate-200 border border-slate-700 rounded-xl p-4 text-sm h-32 outline-none resize-none font-mono leading-relaxed" readonly></textarea>
+                                    <button onclick="App.copyText('prompt-en', true)" class="absolute top-8 right-3 p-2 bg-slate-700 rounded-lg shadow-sm border border-slate-600 text-slate-300 hover:text-white transition text-xs flex items-center gap-1 font-medium"><i class="ph ph-copy"></i> 複製</button>
+                                </div>
+                                <div class="relative group mt-4">
+                                    <label class="block text-xs font-bold text-slate-600 mb-1.5">📊 綜合圖表 AI 提示詞 (Infographic Prompt)</label>
+                                    <textarea id="chart-prompt-en" class="w-full bg-slate-900 text-teal-300 border border-slate-700 rounded-xl p-4 text-sm h-32 outline-none resize-none font-mono leading-relaxed" readonly></textarea>
+                                    <button onclick="App.copyText('chart-prompt-en', true)" class="absolute top-8 right-3 p-2 bg-slate-800 rounded-lg shadow-sm border border-slate-600 text-slate-300 hover:text-white transition text-xs flex items-center gap-1 font-medium"><i class="ph ph-copy"></i> 複製</button>
                                 </div>
                             </div>
                         </div>
                         
                         <!-- 評分區塊 -->
-                        <div id="res-feedback-section" class="mt-8 pt-6 border-t border-slate-100">
-                            <h3 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
-                                <i class="ph-fill ph-star text-amber-400"></i> 這份分析報告準確嗎？
+                        <div id="res-feedback-section" class="mt-10 pt-8 border-t border-slate-100">
+                            <h3 class="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
+                                <i class="ph-fill ph-star text-amber-400 text-lg"></i> 報告準確度評估
                             </h3>
                             <div class="flex flex-wrap gap-2 mb-4" id="feedback-buttons">
-                                <button onclick="App.setFeedback(5, event)" class="px-4 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50 transition shadow-sm">非常準確</button>
-                                <button onclick="App.setFeedback(4, event)" class="px-4 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50 transition shadow-sm">大部分符合</button>
-                                <button onclick="App.setFeedback(3, event)" class="px-4 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50 transition shadow-sm">普通 / 一半一半</button>
-                                <button onclick="App.setFeedback(2, event)" class="px-4 py-2 rounded-lg border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50 transition shadow-sm">不太準確</button>
+                                <button onclick="App.setFeedback(5, event)" class="px-5 py-2.5 rounded-xl border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50 transition shadow-sm">非常準確</button>
+                                <button onclick="App.setFeedback(4, event)" class="px-5 py-2.5 rounded-xl border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50 transition shadow-sm">大部分符合</button>
+                                <button onclick="App.setFeedback(3, event)" class="px-5 py-2.5 rounded-xl border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50 transition shadow-sm">一半一半</button>
+                                <button onclick="App.setFeedback(2, event)" class="px-5 py-2.5 rounded-xl border border-slate-200 text-sm font-medium text-slate-600 hover:bg-slate-50 transition shadow-sm">不太準確</button>
                             </div>
                             <div id="feedback-detail" class="hidden fade-in space-y-3">
-                                <textarea id="feedback-text" rows="3" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none" placeholder="有什麼具體的建議嗎？(選填)"></textarea>
-                                <button onclick="App.submitFeedback(event)" class="px-5 py-2.5 bg-slate-800 text-white rounded-xl text-sm font-bold hover:bg-slate-700 transition shadow">送出回饋</button>
+                                <textarea id="feedback-text" rows="3" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-sm resize-none" placeholder="有什麼具體的建議或心得嗎？(選填)"></textarea>
+                                <button onclick="App.submitFeedback(event)" class="px-6 py-2.5 bg-slate-800 text-white rounded-xl text-sm font-bold hover:bg-slate-700 transition shadow">送出回饋</button>
                             </div>
                         </div>
 
                         <!-- AI 教練對談 -->
-                        <div id="res-chat-section" class="mt-8 pt-6 border-t border-slate-100">
-                            <h3 class="text-sm font-bold text-slate-700 mb-3 flex items-center gap-2">
-                                <i class="ph-fill ph-robot text-blue-500 text-lg"></i> AI 教練深度對談
+                        <div id="res-chat-section" class="mt-10 pt-8 border-t border-slate-100">
+                            <h3 class="text-sm font-bold text-slate-700 mb-4 flex items-center gap-2">
+                                <i class="ph-fill ph-robot text-blue-500 text-xl"></i> 專屬 AI 教練對談
                             </h3>
-                            <div id="chat-history" class="bg-slate-50 rounded-xl p-4 h-64 overflow-y-auto mb-3 border border-slate-100 space-y-3"></div>
+                            <div id="chat-history" class="bg-slate-50 rounded-xl p-5 h-72 overflow-y-auto mb-4 border border-slate-100 space-y-4 shadow-inner"></div>
                             <div class="flex gap-2">
-                                <input type="text" id="chat-input" class="flex-grow px-4 py-3 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-sm shadow-sm" placeholder="例如：我該如何跟不同特質的主管溝通？" onkeypress="if(event.key === 'Enter') App.sendChatMessage()">
-                                <button onclick="App.sendChatMessage()" id="btn-send-chat" class="px-5 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition shadow flex items-center justify-center"><i class="ph-fill ph-paper-plane-right text-lg"></i></button>
+                                <input type="text" id="chat-input" class="flex-grow px-4 py-3.5 bg-white border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 text-sm shadow-sm" placeholder="例如：我該如何跟不同特質的主管溝通？" onkeypress="if(event.key === 'Enter') App.sendChatMessage()">
+                                <button onclick="App.sendChatMessage()" id="btn-send-chat" class="px-6 py-3.5 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition shadow flex items-center justify-center"><i class="ph-fill ph-paper-plane-right text-lg"></i></button>
                             </div>
                         </div>
 
@@ -352,18 +404,18 @@
         </div>
 
         <div id="view-history" class="hidden fade-in max-w-4xl mx-auto">
-            <button onclick="App.navigate('dashboard')" class="mb-4 text-slate-500 hover:text-slate-800 flex items-center gap-1 font-medium"><i class="ph ph-arrow-left"></i>返回首頁</button>
-            <h2 class="text-2xl font-bold mb-6 text-slate-800">歷史紀錄</h2>
+            <button onclick="App.navigate('dashboard')" class="mb-4 text-slate-500 hover:text-slate-800 flex items-center gap-1 font-medium transition"><i class="ph ph-arrow-left"></i>返回首頁</button>
+            <h2 class="text-2xl font-bold mb-6 text-slate-800 flex items-center gap-2"><i class="ph-fill ph-books text-blue-500"></i> 探索紀錄</h2>
             <div id="history-list" class="space-y-4"></div>
         </div>
 
         <div id="view-admin" class="hidden fade-in max-w-5xl mx-auto">
-            <button onclick="App.navigate('dashboard')" class="mb-4 text-slate-500 hover:text-slate-800 flex items-center gap-1 font-medium"><i class="ph ph-arrow-left"></i>返回</button>
+            <button onclick="App.navigate('dashboard')" class="mb-4 text-slate-500 hover:text-slate-800 flex items-center gap-1 font-medium transition"><i class="ph ph-arrow-left"></i>返回首頁</button>
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                 <h2 class="text-2xl font-bold mb-6 flex items-center gap-2"><i class="ph-fill ph-shield-check text-emerald-500"></i>會員管理系統</h2>
                 <div class="overflow-x-auto">
                     <table class="w-full text-left text-sm text-slate-600">
-                        <thead class="bg-slate-50 font-bold text-slate-700">
+                        <thead class="bg-slate-50 font-bold text-slate-700 border-b border-slate-200">
                             <tr><th class="p-4 rounded-tl-lg">信箱</th><th class="p-4">姓名</th><th class="p-4">角色</th><th class="p-4">註冊時間</th><th class="p-4 rounded-tr-lg">操作</th></tr>
                         </thead>
                         <tbody id="admin-user-list"></tbody>
@@ -371,37 +423,79 @@
                 </div>
             </div>
         </div>
+
+        <div id="view-guide" class="hidden fade-in max-w-4xl mx-auto space-y-6">
+            <button onclick="App.navigate('dashboard')" class="mb-2 text-slate-500 hover:text-slate-800 flex items-center gap-1 font-medium transition"><i class="ph ph-arrow-left"></i>返回首頁</button>
+            
+            <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-8 sm:p-10">
+                <div class="text-center mb-10">
+                    <i class="ph-fill ph-book-open text-emerald-500 text-5xl mb-3"></i>
+                    <h2 class="text-3xl font-bold text-slate-800 mb-3">系統白皮書與方法論</h2>
+                    <p class="text-slate-500">Persona Bloom - 三重意象分析框架解析</p>
+                </div>
+
+                <div class="prose prose-slate max-w-none">
+                    <h3>理論基礎：榮格心理學與多維度特質模型</h3>
+                    <p>Persona Bloom 的核心設計並非基於單一的測驗指標，而是融合了<strong>卡爾·榮格（Carl Jung）的心理類型學</strong>與現代組織行為學中的<strong>大五人格特質（Big Five）</strong>精神。我們將人類複雜的內在動能、外在行為與社交面貌，解構為三個易於理解且充滿共鳴的視覺意象：<strong>顏色、動物與植物</strong>。</p>
+                    
+                    <h3>三重意象架構解析</h3>
+                    <ul>
+                        <li><strong>外在氣質 (顏色 Color)：</strong>代表您在初次見面或社交場合中，散發給他人的第一印象與情緒氛圍。顏色暗示了您的溝通風格（如：熱情的暖色調 vs 理性的冷色調）。</li>
+                        <li><strong>行動模式 (動物 Animal)：</strong>象徵您面對挑戰、處理任務以及在職場/團隊中的行動策略。是像獅子般主導、像海豚般協作，還是像貓頭鷹般深思熟慮？</li>
+                        <li><strong>內在動能 (植物 Flower)：</strong>反映您潛意識的需求、價值觀以及自我修復的方式。植物代表了您靈魂深處的根基與韌性。</li>
+                    </ul>
+
+                    <h3>如何發揮分析報告的價值？</h3>
+                    <p>本系統產出的報告不僅僅是測驗結果，它是一份<strong>「個人品牌與職場發展指南」</strong>。您應該：</p>
+                    <ol>
+                        <li><strong>審視盲點：</strong>報告中會誠實指出您的潛在壓力源與盲點，這往往是個人成長的突破口。</li>
+                        <li><strong>應用職場建議：</strong>利用報告中的「職場與人際建議」來調整您與不同主管、同事的協作方式。</li>
+                        <li><strong>視覺化個人品牌：</strong>運用系統提供的「AI 圖表生成提示詞 (Prompt)」，透過 ChatGPT 或其他 AI 繪圖工具，將您的測驗結果製作成高質感的社群圖卡，展現獨特的個人魅力。</li>
+                    </ol>
+
+                    <div class="bg-blue-50 border border-blue-100 rounded-xl p-5 mt-8 flex items-start gap-3">
+                        <i class="ph-fill ph-info text-blue-500 text-2xl mt-0.5"></i>
+                        <p class="text-sm text-blue-800 m-0 leading-relaxed"><strong>免責聲明：</strong> Persona Bloom 是一款專為自我探索、職涯發展與團隊破冰設計的 AI 創意工具。其分析結果基於語言模型對作答軌跡的歸納，並不具備臨床心理學或醫療診斷之效力。</p>
+                    </div>
+                </div>
+            </div>
+        </div>
     </main>
 
-    <div id="custom-modal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4 fade-in">
+    <div id="custom-modal" class="fixed inset-0 bg-slate-900/60 z-50 hidden flex items-center justify-center p-4 fade-in backdrop-blur-sm">
         <div class="bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden transform transition-all">
             <div class="p-6 sm:p-8">
                 <h3 id="custom-modal-title" class="text-xl font-bold text-slate-800 mb-3 flex items-center"></h3>
-                <p id="custom-modal-desc" class="text-slate-600 text-sm leading-relaxed mb-6"></p>
-                <div id="custom-modal-input-container" class="mb-6 hidden"><input type="text" id="custom-modal-input" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-medium"></div>
-                <div id="custom-modal-html-container" class="mb-4 hidden"></div>
-                <div class="flex gap-3 justify-end">
-                    <button onclick="document.getElementById('custom-modal').classList.add('hidden')" class="px-5 py-2.5 bg-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-200 transition">取消 / 關閉</button>
+                <p id="custom-modal-desc" class="text-slate-600 text-sm leading-relaxed mb-5"></p>
+                
+                <div id="custom-modal-input-container" class="mb-6 hidden">
+                    <input type="text" id="custom-modal-input" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl focus:ring-2 focus:ring-blue-500 outline-none font-medium">
+                </div>
+                
+                <div id="custom-modal-html-container" class="mb-5 hidden"></div>
+                
+                <div class="flex gap-3 justify-end mt-4">
+                    <button onclick="document.getElementById('custom-modal').classList.add('hidden')" class="px-5 py-2.5 bg-slate-100 text-slate-600 rounded-xl font-bold hover:bg-slate-200 transition">取消</button>
                     <button id="custom-modal-confirm" class="px-5 py-2.5 rounded-xl font-bold transition text-white shadow-md">確定</button>
                 </div>
             </div>
         </div>
     </div>
 
-    <footer class="bg-slate-900 text-slate-400 py-6 mt-auto">
+    <footer class="bg-slate-900 text-slate-400 py-8 mt-auto border-t border-slate-800">
         <div class="max-w-5xl mx-auto px-4 text-center text-sm">
             <p>© 2026 TONY STUDIO. 本教材由 TONY STUDIO 楊文澤顧問設計. All Rights Reserved.</p>
-            <p class="mt-1 text-xs opacity-70">本產品為創意人格意象與自我探索工具，非臨床心理診斷。</p>
+            <p class="mt-2 text-xs opacity-60">本產品為創意人格意象與自我探索工具，非臨床心理診斷。</p>
         </div>
     </footer>
 
     <script>
+        // 核心設定：升級為 Gemini 3.7 Flash
         const APP_CONFIG = {
             creatorEmail: "mindnodeai@gmail.com",
             models: {
-                analysis: "gemini-3.5-flash",
-                image: "imagen-3.0-generate-001",
-                chat: "gemini-3-flash-preview", 
+                analysis: "gemini-3.7-flash",
+                chat: "gemini-3.7-flash", 
                 tts: "gemini-2.5-flash-preview-tts" 
             }
         };
@@ -417,9 +511,9 @@
         };
 
         if (!firebase.apps.length) firebase.initializeApp(firebaseConfig);
-        const firebaseAuth = firebase.auth(); const firebaseDb = firebase.firestore(); const firebaseStorage = firebase.storage();
+        const firebaseAuth = firebase.auth(); const firebaseDb = firebase.firestore();
 
-        // 12 道標準備用題庫
+        // 12 道標準備用題庫 (防呆機制)
         const mockQuestions = [
             { id: "q1", text: "團隊臨時出現一個沒有標準答案的問題，你通常會……", options: [{ text: "先整理資訊，再提出可驗證的做法", type: "ANA" }, { text: "憑直覺提出幾個新點子，先試再說", type: "EXP" }, { text: "先安撫大家焦慮的情緒，建立共識", type: "WARM" }, { text: "靜靜觀察，等別人先發言", type: "RES" }] },
             { id: "q2", text: "週末有一整天的空閒，你最傾向怎麼安排？", options: [{ text: "規劃好一整天的充實行程", type: "STR" }, { text: "找一群好朋友聚餐聊天", type: "ENG" }, { text: "一個人找間咖啡廳安靜閱讀", type: "ANA" }, { text: "走到哪算到哪，探索沒去過的街區", type: "EXP" }] },
@@ -439,7 +533,8 @@
             currentUser: null, apiKeyCache: '', currentTask: null, currentQuestionIndex: 0,
             activeQuestions: [], taskFiles: [], currentReport: null,
             currentFeedbackRating: 0, chatHistory: [], historyData: [],
-            isAuthProcessing: false, hasSetupAuthListener: false, qLoadingInterval: null, rLoadingInterval: null,
+            isAuthProcessing: false, hasSetupAuthListener: false, 
+            qLoadingInterval: null, rLoadingInterval: null, 
 
             init() {
                 this.setupAuthListener();
@@ -449,14 +544,19 @@
 
             showToast(msg, type = 'success') {
                 const t = document.getElementById('toast'); t.textContent = msg;
-                t.className = `fixed top-5 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full text-white font-medium shadow-lg transition-all duration-300 z-50 bg-${type==='success'?'emerald':type==='error'?'rose':type==='warning'?'yellow':'blue'}-500`;
+                t.className = `fixed top-5 left-1/2 transform -translate-x-1/2 px-6 py-3 rounded-full text-white font-medium shadow-lg transition-all duration-300 z-50 bg-${type==='success'?'emerald':type==='error'?'rose':type==='warning'?'yellow':'blue'}-600`;
                 t.classList.remove('hidden', 'opacity-0');
                 setTimeout(() => t.classList.add('opacity-0'), 3000); setTimeout(() => t.classList.add('hidden'), 3300);
             },
 
             navigate(viewId) {
-                ['view-auth', 'view-dashboard', 'view-task-form', 'view-questionnaire', 'view-result', 'view-history', 'view-admin'].forEach(v => document.getElementById(v).classList.add('hidden'));
-                document.getElementById('view-' + viewId).classList.remove('hidden');
+                ['view-auth', 'view-dashboard', 'view-task-form', 'view-questionnaire', 'view-result', 'view-history', 'view-admin', 'view-guide'].forEach(v => {
+                    const el = document.getElementById(v);
+                    if (el) el.classList.add('hidden');
+                });
+                const target = document.getElementById('view-' + viewId);
+                if (target) target.classList.remove('hidden');
+                
                 if (viewId === 'dashboard') document.getElementById('api-key-input').value = this.apiKeyCache;
                 if (viewId === 'history') this.loadHistory();
                 if (viewId === 'admin') this.loadAdmin();
@@ -469,7 +569,7 @@
                     userSec.classList.remove('hidden');
                     document.getElementById('nav-user-name').textContent = this.currentUser.displayName || this.currentUser.email.split('@')[0];
                     let roleStr = '探索者'; adminBtn.classList.add('hidden');
-                    if (this.currentUser.email === APP_CONFIG.creatorEmail) { roleStr = '系統創作者'; adminBtn.classList.remove('hidden'); }
+                    if (this.currentUser.email === APP_CONFIG.creatorEmail) { roleStr = '系統管理員'; adminBtn.classList.remove('hidden'); }
                     document.getElementById('nav-user-role').textContent = roleStr;
                 } else userSec.classList.add('hidden');
             },
@@ -540,8 +640,10 @@
                             if (w > h && w > MAX) { h *= MAX/w; w = MAX; } else if (h > MAX) { w *= MAX/h; h = MAX; }
                             const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
                             canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                            let out = canvas.toDataURL('image/jpeg', 0.85);
-                            resolve(out.length < e.target.result.length ? { data: out, mimeType: 'image/jpeg' } : { data: e.target.result, mimeType: file.type });
+                            // 優先嘗試 WebP，如果瀏覽器不支援則會降級回 JPEG
+                            let out = canvas.toDataURL('image/webp', 0.82);
+                            if (out.length >= e.target.result.length) out = e.target.result; // 若壓縮反而變大則不用
+                            resolve({ data: out, mimeType: out.startsWith('data:image/webp') ? 'image/webp' : file.type });
                         };
                     };
                 });
@@ -553,17 +655,20 @@
                     if (this.taskFiles.length >= 5) { this.showToast('最多上傳 5 個附件', 'warning'); break; }
                     if (file.size > 15*1024*1024) { this.showToast(`檔案 ${file.name} 超過 15MB 上限`, 'error'); continue; }
                     
+                    let fName = file.name; if (fName.length > 20) fName = fName.substring(0,10) + '...' + fName.substring(fName.length-7);
+
                     if (file.type.startsWith('image/')) {
-                        this.showToast(`正在壓縮圖片：${file.name}...`, 'info');
+                        this.showToast(`正在壓縮圖片...`, 'info');
                         const res = await this.compressImage(file);
-                        this.taskFiles.push({ name: file.name, mimeType: res.mimeType, data: res.data, type: 'inline' });
+                        this.taskFiles.push({ name: fName, mimeType: res.mimeType, data: res.data, type: 'inline' });
                     } else if (file.type.match(/(text|json|csv)/)) {
                         const reader = new FileReader();
-                        reader.onload = (e) => { this.taskFiles.push({ name: file.name, data: e.target.result, type: 'text' }); this.renderTaskFiles(); };
+                        reader.onload = (e) => { this.taskFiles.push({ name: fName, data: e.target.result, type: 'text' }); this.renderTaskFiles(); };
                         reader.readAsText(file); continue;
-                    } else { // 影片、語音、PDF 等轉 Base64 Inline
+                    } else { 
+                        // PDF, 影片, 語音等
                         const reader = new FileReader();
-                        reader.onload = (e) => { this.taskFiles.push({ name: file.name, mimeType: file.type, data: e.target.result, type: 'inline' }); this.renderTaskFiles(); };
+                        reader.onload = (e) => { this.taskFiles.push({ name: fName, mimeType: file.type, data: e.target.result, type: 'inline' }); this.renderTaskFiles(); };
                         reader.readAsDataURL(file); continue;
                     }
                     this.renderTaskFiles();
@@ -579,13 +684,15 @@
             renderTaskFiles() {
                 const list = document.getElementById('file-preview-list'); list.innerHTML = '';
                 this.taskFiles.forEach((f, i) => {
-                    list.innerHTML += `<li class="flex justify-between items-center bg-slate-50 px-3 py-2 rounded-lg text-sm border border-slate-200">
-                        <div class="flex items-center gap-2 overflow-hidden text-slate-600"><i class="ph ${f.type==='inline'?'ph-file-image':'ph-file-text'}"></i><span class="truncate">${f.name}</span></div>
-                        <button onclick="App.removeTaskFile(${i})" class="text-slate-400 hover:text-rose-500"><i class="ph ph-trash"></i></button></li>`;
+                    list.innerHTML += `<li class="flex justify-between items-center bg-slate-50 px-3 py-2 rounded-lg text-sm border border-slate-200 shadow-sm">
+                        <div class="flex items-center gap-2 text-slate-600"><i class="ph ${f.type==='inline'?'ph-file-image':'ph-file-text'}"></i><span>${f.name}</span></div>
+                        <button onclick="App.removeTaskFile(${i})" class="text-slate-400 hover:text-rose-500 transition"><i class="ph ph-trash"></i></button></li>`;
                 });
             },
 
             async startQuestionnaire() {
+                const apiKey = this.getApiKey(); if (!apiKey) return;
+                
                 this.currentTask = { 
                     id: Date.now().toString(), 
                     title: document.getElementById('task-title').value || "我的探索", 
@@ -593,47 +700,46 @@
                     target: document.getElementById('task-target').value,
                     purpose: document.getElementById('task-purpose').value,
                     depthPreference: document.getElementById('task-depth').value,
-                    answers: [],
-                    mode: document.querySelector('input[name="question-mode"]:checked')?.value || 'ai' 
+                    answers: []
                 };
                 this.currentQuestionIndex = 0; this.navigate('questionnaire');
                 
-                const apiKey = this.getApiKey();
-                document.getElementById('q-error-state').classList.add('hidden'); document.getElementById('q-content-state').classList.add('hidden');
+                document.getElementById('q-error-state').classList.add('hidden'); 
+                document.getElementById('q-content-state').classList.add('hidden');
+                document.getElementById('q-loading-state').classList.remove('hidden');
                 
-                if (this.currentTask.mode === 'ai' && apiKey) {
-                    document.getElementById('q-loading-state').classList.remove('hidden');
-                    let texts = ["分析您的探索情境...", "評估最佳測驗長度...", "即時生成客製化情境題..."]; let tIdx = 0;
-                    const el = document.getElementById('q-loading-text'); el.textContent = texts[0];
-                    this.qLoadingInterval = setInterval(() => { el.style.opacity=0; setTimeout(()=>{ tIdx=(tIdx+1)%texts.length; el.textContent=texts[tIdx]; el.style.opacity=1;},400); }, 3000);
+                // 動態提示文字
+                let texts = ["分析您的探索情境...", "評估合適測驗維度...", "啟動 Gemini 3.7 引擎..."]; let tIdx = 0;
+                const el = document.getElementById('q-loading-text'); el.textContent = texts[0];
+                if (this.qLoadingInterval) clearInterval(this.qLoadingInterval);
+                this.qLoadingInterval = setInterval(() => { el.style.opacity=0; setTimeout(()=>{ tIdx=(tIdx+1)%texts.length; el.textContent=texts[tIdx]; el.style.opacity=1;},400); }, 3000);
 
-                    let attempt = 0;
-                    while(attempt < 2) {
-                        try { 
-                            this.activeQuestions = await this.generateAIQuestions(apiKey); 
-                            document.getElementById('q-content-state').classList.remove('hidden'); 
-                            this.renderQuestion(); 
-                            break; // 成功即跳出迴圈
-                        } 
-                        catch (e) {
-                            attempt++;
-                            if (attempt >= 2) {
-                                document.getElementById('q-error-state').classList.remove('hidden');
-                                document.getElementById('q-error-text').textContent = e.message || '連線逾時或格式異常。';
-                            }
-                        } finally { if(attempt>=2 || this.activeQuestions.length>0){ clearInterval(this.qLoadingInterval); document.getElementById('q-loading-state').classList.add('hidden');} }
-                    }
-                } else this.fallbackToStandardQuestions();
+                let attempt = 0;
+                while(attempt < 2) {
+                    try { 
+                        this.activeQuestions = await this.generateAIQuestions(apiKey); 
+                        if(!this.activeQuestions || this.activeQuestions.length < 3) throw new Error("題目產出數量不足");
+                        document.getElementById('q-content-state').classList.remove('hidden'); 
+                        this.renderQuestion(); 
+                        break; 
+                    } 
+                    catch (e) {
+                        attempt++;
+                        if (attempt >= 2) {
+                            document.getElementById('q-error-state').classList.remove('hidden');
+                            document.getElementById('q-error-text').textContent = "系統防呆攔截：" + (e.message || '連線異常');
+                        }
+                    } finally { if(attempt>=2 || this.activeQuestions.length>0){ clearInterval(this.qLoadingInterval); document.getElementById('q-loading-state').classList.add('hidden');} }
+                }
             },
 
             async generateAIQuestions(apiKey) {
-                // 根據使用者的偏好，給 AI 的指令長度提示
                 let lengthInstruction = "";
                 switch(this.currentTask.depthPreference) {
-                    case 'quick': lengthInstruction = "請產出剛好 5 到 8 題，適合快速評估。"; break;
-                    case 'standard': lengthInstruction = "請產出剛好 10 到 12 題，適合平衡深度的評估。"; break;
+                    case 'quick': lengthInstruction = "請產出剛好 6 題，適合快速評估。"; break;
+                    case 'standard': lengthInstruction = "請產出剛好 10 題，適合平衡深度的評估。"; break;
                     case 'deep': lengthInstruction = "請產出剛好 15 題，適合全面且深度的剖析。"; break;
-                    case 'dynamic': default: lengthInstruction = "請您身為專家，『自行判斷』需要幾題（建議介於 5 到 15 題之間）才能精準評估該情境下的六大維度。若情境複雜請多出題，情境簡單可少出題。"; break;
+                    case 'dynamic': default: lengthInstruction = "請您身為專家自行判斷，產出 8 到 12 題之間。"; break;
                 }
 
                 const prompt = `您是一位頂尖的心理測驗設計師。請根據使用者提供的背景、探索目的與偏好，動態打造一份專屬的情境選擇題。
@@ -642,10 +748,10 @@
 【背景說明】：${this.currentTask.background || '無特殊說明'}
 【長度指示】：${lengthInstruction}
 
-【硬性輸出要求 (絕對嚴格遵守)】：
-1. 格式：嚴格只輸出 JSON 陣列，不要加入任何 \`\`\`json 標籤或思考過程。
-2. 內容安全：絕對禁止在 JSON 中使用半形雙引號 (") 作為對話或內容的引號，請一律使用單引號 (') 或全形字元（「」）。這會導致系統崩潰！
-3. 資料結構範例：[{"id":"q1","text":"...","options":[{"text":"...","type":"ENG"}]}]
+【硬性輸出要求 (絕對嚴格遵守，攸關系統存亡)】：
+1. 格式：嚴格只輸出 JSON 陣列，不要加入任何引言、結語或 markdown 標籤。
+2. 內容安全：絕對禁止在 JSON 中使用半形雙引號 (") 作為對話或內容的引號，請一律使用單引號 (') 或全形字元（「」）。
+3. 資料結構範例：[{"id":"q1","text":"題目內容","options":[{"text":"選項一","type":"ENG"}]}]
 4. 選項 type 限填：ENG(互動), WARM(情感), ANA(分析), STR(結構), EXP(探索), RES(韌性)。每題必須有 4 個不同 type 的選項。`;
 
                 let parts = [{ text: prompt }];
@@ -656,23 +762,18 @@
 
                 const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${APP_CONFIG.models.analysis}:generateContent?key=${apiKey}`, {
                     method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        contents: [{ parts: parts }], 
-                        generationConfig: { responseMimeType: "application/json", maxOutputTokens: 8192 } 
-                    })
+                    body: JSON.stringify({ contents: [{ parts: parts }], generationConfig: { responseMimeType: "application/json", maxOutputTokens: 8192 } })
                 });
                 
                 const data = await res.json(); 
                 if (data.error) throw new Error(data.error.message);
-                if (!data.candidates?.[0]?.content?.parts) throw new Error("AI 回應格式錯誤或遭到安全審查攔截");
                 
                 let rawText = data.candidates[0].content.parts[0].text;
                 rawText = rawText.replace(/[\x00-\x1F]+/g, ""); // 拔除隱形控制字元
                 
-                try { 
-                    return JSON.parse(rawText); 
-                } catch (e) {
-                    // 正則保護網：萬一 AI 還是塞了廢話，硬抓 [] 陣列
+                try { return JSON.parse(rawText); } 
+                catch (e) {
+                    // 正則保護網：擷取陣列 []
                     const match = rawText.match(/\[\s*\{[\s\S]*\}\s*\]/);
                     if (match) return JSON.parse(match[0]);
                     throw new Error("JSON 解析失敗，可能含有不合法字元。");
@@ -681,7 +782,6 @@
 
             fallbackToStandardQuestions() {
                 document.getElementById('q-error-state').classList.add('hidden'); document.getElementById('q-content-state').classList.remove('hidden');
-                // 若選擇快速，備用題庫也只取前 6 題
                 this.activeQuestions = this.currentTask.depthPreference === 'quick' ? mockQuestions.slice(0, 6) : [...mockQuestions];
                 this.renderQuestion();
             },
@@ -693,7 +793,7 @@
                 document.getElementById('q-text').textContent = q.text;
                 let html = '';
                 q.options.forEach((opt, idx) => {
-                    html += `<button onclick="App.answerQuestion(${idx})" class="w-full text-left p-4 rounded-xl border border-slate-200 bg-slate-50 hover:bg-rose-50 transition font-medium text-slate-700 shadow-sm flex items-start gap-3"><span class="w-6 h-6 rounded-full bg-slate-200 text-slate-600 font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">${String.fromCharCode(65 + idx)}</span><span>${opt.text}</span></button>`;
+                    html += `<button onclick="App.answerQuestion(${idx})" class="w-full text-left p-4 rounded-xl border border-slate-200 bg-slate-50 hover:bg-rose-50 transition font-medium text-slate-700 shadow-sm flex items-start gap-3"><span class="w-6 h-6 rounded-full bg-slate-200 text-slate-600 font-bold text-xs flex items-center justify-center shrink-0 mt-0.5">${String.fromCharCode(65 + idx)}</span><span class="leading-relaxed">${opt.text}</span></button>`;
                 });
                 document.getElementById('q-options').innerHTML = html;
             },
@@ -710,22 +810,24 @@
                 document.getElementById('res-main-content').classList.add('hidden'); document.getElementById('res-error-state').classList.add('hidden');
                 document.getElementById('res-ai-loading').classList.remove('hidden');
                 
-                let texts = ["整合作答軌跡...", "運用榮格心理學框架深度解析...", "建構專屬三重意象...", "撰寫完整行動建議報告..."]; let tIdx = 0;
+                let texts = ["整合作答軌跡...", "分析多模態附件...", "運用榮格心理學深度解析...", "建構專屬三重意象...", "撰寫完整行動建議報告..."]; let tIdx = 0;
                 const el = document.getElementById('res-ai-loading-text'); el.textContent = texts[0];
+                if (this.rLoadingInterval) clearInterval(this.rLoadingInterval);
                 this.rLoadingInterval = setInterval(() => { el.style.opacity=0; setTimeout(()=>{ tIdx=(tIdx+1)%texts.length; el.textContent=texts[tIdx]; el.style.opacity=1;},400); }, 3500);
 
-                const prompt = `您是具備深厚榮格心理學與組織行為學底蘊的頂尖人格分析師。請根據使用者的背景與作答，產生繁體中文「三重意象分析報告」。
+                const prompt = `您是具備深厚榮格心理學與組織行為學底蘊的頂尖人格分析師。請根據使用者的背景、上傳資料與作答，產生繁體中文「三重意象分析報告」。
 【探索對象】：${this.currentTask.target === 'self' ? '自己' : '其他人'}
 【探索目的】：${this.currentTask.purpose}
 【作答紀錄】：${JSON.stringify(this.currentTask.answers)}
 
 【硬性輸出要求 (嚴格遵守)】：
-1. 必須輸出純 JSON 物件，不含 \`\`\`json 標籤。
-2. 包含欄位：reportTitle, oneLineIdentity, summary, color(含 name, meaning), animal(含 name, meaning), flower(含 name, meaning), integratedNarrative, strengths(陣列), watchouts(陣列), workAndLearning(陣列), actionPlan(陣列物件，含 action, reason), imageConceptZh, imagePromptEn。
-3. 字元安全：絕對禁止在內容中使用半形雙引號 (") 作為內容標點，請一律替換為全形（「」或『』）或單引號。
-4. 視覺意象要求 (極度重要)：請務必將測驗出的「顏色」、「動物」、「植物」這三個元素，完美且合理地【融合在同一個情境畫面中】，藉此表現該人格特質的張力與氛圍。
-   - imageConceptZh：用 50~80 字左右的優美中文，描述這個三者融合的畫面情境。
-   - imagePromptEn：將上述情境轉為精準的 Midjourney 英文提示詞 (Prompt)，確保顏色、動物、植物這三個單字都被明確提及且互動融合。`;
+1. 必須輸出純 JSON 物件，不含引言與 markdown 標籤。
+2. 包含欄位：reportTitle, oneLineIdentity, summary, color(含 name, meaning), animal(含 name, meaning), flower(含 name, meaning), integratedNarrative, strengths(陣列), watchouts(陣列), workAndLearning(陣列), actionPlan(陣列物件，含 action, reason), imageConceptZh, imagePromptEn, chartPromptEn。
+3. 字元安全：絕對禁止在內容中使用半形雙引號 (") 作為內容標點，請一律替換為全形（「」）或單引號。
+4. 視覺意象要求：
+   - imageConceptZh：用 80 字優美中文描述將這三個元素融合的「情境畫面」。
+   - imagePromptEn：將上述情境轉為精準的 Midjourney 英文提示詞。
+   - chartPromptEn：產生一段英文提示詞 (Prompt)，用於讓 AI 生成一張高質感的「綜合意象分析資訊圖表 (Infographic / Diagram)」。圖表中必須同時出現並解析「顏色」、「動物」與「植物」這三個元素。設計風格請指定為：modern infographic, clean UI/UX layout, data visualization, elegant flat design, psychological profile dashboard。`;
 
                 let parts = [{ text: prompt }];
                 if (this.taskFiles && this.taskFiles.length > 0) {
@@ -740,14 +842,10 @@
                     try {
                         const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${APP_CONFIG.models.analysis}:generateContent?key=${apiKey}`, {
                             method: 'POST', headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ 
-                                contents: [{ parts: parts }], 
-                                generationConfig: { responseMimeType: "application/json", maxOutputTokens: 8192 } 
-                            })
+                            body: JSON.stringify({ contents: [{ parts: parts }], generationConfig: { responseMimeType: "application/json", maxOutputTokens: 8192 } })
                         });
                         const data = await res.json(); 
                         if (data.error) throw new Error(data.error.message);
-                        if (!data.candidates?.[0]?.content?.parts) throw new Error("API 未回傳有效內容");
                         
                         let rawText = data.candidates[0].content.parts[0].text;
                         rawText = rawText.replace(/[\x00-\x1F]+/g, ""); 
@@ -783,10 +881,51 @@
             },
 
             renderReport(r) {
+                // 安全防呆：確保 hex 存在，否則給予預設值
+                const hexColor = r.color?.hex || '#64748b';
+                
+                // 【核心升級】運用免 Key 且絕對穩定的 URL 渲染引擎，即時產生真實照片！
+                // 1. 真實動物頭像 (國家地理風格)
+                const animalUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent('Highly detailed realistic national geographic portrait photography of ' + (r.animal?.name || 'animal') + ', solid white background')}?width=256&height=256&nologo=true`;
+                // 2. 真實植物微距照 (植物圖鑑風格)
+                const plantUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent('Highly detailed realistic macro photography of ' + (r.flower?.name || 'plant') + ', solid white background')}?width=256&height=256&nologo=true`;
+                // 3. 結合三大元素的巨幅情境圖 (讀取自 AI 剛剛為您量身打造的英文 Prompt)
+                const sceneUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(r.imagePromptEn || 'Beautiful abstract artistic psychological landscape')}?width=1024&height=512&nologo=true`;
+
+                // 左側面板：將原本的 Emoji 替換為「真實攝影圖片」
                 document.getElementById('res-summary-badges').innerHTML = `
-                    <div class="flex items-start gap-4 p-3 bg-slate-50 rounded-xl border border-slate-100"><div class="w-10 h-10 rounded-full bg-blue-100 flex items-center justify-center text-blue-600 shrink-0 mt-1"><i class="ph-fill ph-palette text-xl"></i></div><div><div class="text-xs text-slate-500 font-bold mb-0.5">顏色氣質</div><div class="font-bold text-slate-800 text-lg mb-1">${r.color?.name||'-'}</div><div class="text-sm text-slate-600 leading-relaxed">${r.color?.meaning||''}</div></div></div>
-                    <div class="flex items-start gap-4 p-3 bg-slate-50 rounded-xl border border-slate-100"><div class="w-10 h-10 rounded-full bg-amber-100 flex items-center justify-center text-amber-600 shrink-0 mt-1"><i class="ph-fill ph-paw-print text-xl"></i></div><div><div class="text-xs text-slate-500 font-bold mb-0.5">動物行動</div><div class="font-bold text-slate-800 text-lg mb-1">${r.animal?.name||'-'}</div><div class="text-sm text-slate-600 leading-relaxed">${r.animal?.meaning||''}</div></div></div>
-                    <div class="flex items-start gap-4 p-3 bg-slate-50 rounded-xl border border-slate-100"><div class="w-10 h-10 rounded-full bg-emerald-100 flex items-center justify-center text-emerald-600 shrink-0 mt-1"><i class="ph-fill ph-plant text-xl"></i></div><div><div class="text-xs text-slate-500 font-bold mb-0.5">植物內在</div><div class="font-bold text-slate-800 text-lg mb-1">${r.flower?.name||'-'}</div><div class="text-sm text-slate-600 leading-relaxed">${r.flower?.meaning||''}</div></div></div>`;
+                    <div class="flex items-start gap-4">
+                        <div class="w-14 h-14 rounded-full flex items-center justify-center shrink-0 shadow-sm border-2 border-white ring-2 ring-slate-100" style="background-color: ${hexColor}20;">
+                            <div class="w-8 h-8 rounded-full shadow-inner" style="background-color: ${hexColor};"></div>
+                        </div>
+                        <div>
+                            <div class="text-xs font-bold mb-0.5 uppercase tracking-wide" style="color: ${hexColor};">外在氣質</div>
+                            <div class="font-bold text-slate-800 text-lg mb-1">${r.color?.name||'-'}</div>
+                            <div class="text-sm text-slate-600 leading-relaxed">${r.color?.meaning||''}</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4 mt-6">
+                        <div class="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center shrink-0 shadow-sm border-2 border-white ring-2 ring-amber-100 overflow-hidden relative">
+                            <i class="ph ph-spinner-gap ph-spin text-slate-400 absolute z-0 text-xl"></i>
+                            <img src="${animalUrl}" class="w-full h-full object-cover absolute inset-0 z-10 fade-in" alt="${r.animal?.name}">
+                        </div>
+                        <div>
+                            <div class="text-xs text-amber-600 font-bold mb-0.5 uppercase tracking-wide">行動模式</div>
+                            <div class="font-bold text-slate-800 text-lg mb-1">${r.animal?.name||'-'}</div>
+                            <div class="text-sm text-slate-600 leading-relaxed">${r.animal?.meaning||''}</div>
+                        </div>
+                    </div>
+                    <div class="flex items-start gap-4 mt-6">
+                        <div class="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center shrink-0 shadow-sm border-2 border-white ring-2 ring-emerald-100 overflow-hidden relative">
+                            <i class="ph ph-spinner-gap ph-spin text-slate-400 absolute z-0 text-xl"></i>
+                            <img src="${plantUrl}" class="w-full h-full object-cover absolute inset-0 z-10 fade-in" alt="${r.flower?.name}">
+                        </div>
+                        <div>
+                            <div class="text-xs text-emerald-600 font-bold mb-0.5 uppercase tracking-wide">內在動能</div>
+                            <div class="font-bold text-slate-800 text-lg mb-1">${r.flower?.name||'-'}</div>
+                            <div class="text-sm text-slate-600 leading-relaxed">${r.flower?.meaning||''}</div>
+                        </div>
+                    </div>`;
 
                 let md = `## ${r.reportTitle || '您的意象分析'}\n\n**${r.oneLineIdentity || ''}**\n\n${r.summary || ''}\n\n### 🧠 綜合深度解析\n${r.integratedNarrative || ''}\n\n`;
                 if (r.strengths?.length) { md += `### 🌟 核心優勢與潛力\n`; r.strengths.forEach(s => md += `- ${s}\n`); md += `\n`; }
@@ -794,147 +933,88 @@
                 if (r.workAndLearning?.length) { md += `### 💼 職場與人際建議\n`; r.workAndLearning.forEach(w => md += `- ${w}\n`); md += `\n`; }
                 if (r.actionPlan?.length) { md += `### 🚀 專屬行動計畫\n`; r.actionPlan.forEach(act => md += `- **${act.action}**：${act.reason}\n`); }
 
-                document.getElementById('res-ai-content').innerHTML = marked.parse(md);
+                // 【核心升級】將融合三大元素的「巨幅情境圖」安插在報告最上方
+                const loaderId = 'loader-' + Date.now();
+                const heroImageHtml = `
+                    <div class="mb-8 rounded-2xl overflow-hidden shadow-sm border border-slate-100 bg-slate-50 relative aspect-[2/1] group">
+                        <div id="${loaderId}" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 z-0 bg-slate-50">
+                            <i class="ph ph-image text-4xl mb-3 animate-pulse"></i>
+                            <span class="text-sm font-medium tracking-wider">AI 正在即時繪製三大元素融合情境...</span>
+                        </div>
+                        <img src="${sceneUrl}" class="w-full h-full object-cover absolute inset-0 z-10 opacity-0 transition-opacity duration-1000 ease-in-out" alt="專屬意象情境圖" onload="document.getElementById('${loaderId}').style.display='none'; this.style.opacity=1;">
+                        <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-slate-900/80 to-transparent p-5 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                            <p class="text-white text-sm font-medium leading-relaxed"><i class="ph-fill ph-sparkle text-amber-400 mr-1"></i> ${r.imageConceptZh || '您的專屬心理意象'}</p>
+                        </div>
+                    </div>`;
+
+                // 將圖片與 Markdown 分析報告結合並渲染
+                document.getElementById('res-ai-content').innerHTML = heroImageHtml + marked.parse(md);
                 document.getElementById('prompt-zh').value = r.imageConceptZh || '未產生中文構想';
                 document.getElementById('prompt-en').value = r.imagePromptEn || '未產生英文提示詞';
+                document.getElementById('chart-prompt-en').value = r.chartPromptEn || '未產生圖表提示詞';
             },
 
             async fallbackCopyTextToClipboard(text) {
                 var textArea = document.createElement("textarea");
-                textArea.value = text;
-                textArea.style.top = "0"; textArea.style.left = "0"; textArea.style.position = "fixed";
+                textArea.value = text; textArea.style.top = "0"; textArea.style.left = "0"; textArea.style.position = "fixed";
                 document.body.appendChild(textArea);
                 textArea.focus(); textArea.select();
                 try {
-                    var successful = document.execCommand('copy');
-                    if (successful) this.showToast('已複製！', 'success');
-                    else this.showToast('複製失敗，請手動選取複製', 'error');
-                } catch (err) {
-                    this.showToast('複製失敗，請手動選取複製', 'error');
-                }
+                    if (document.execCommand('copy')) this.showToast('已複製！', 'success');
+                    else this.showToast('請手動選取複製', 'warning');
+                } catch (err) { this.showToast('複製失敗', 'error'); }
                 document.body.removeChild(textArea);
             },
-
             async copyText(elementId, isValue = false) {
                 try {
-                    let text = '';
-                    if (isValue) {
-                       text = document.getElementById(elementId).value;
-                    } else {
-                        const el = document.getElementById(elementId);
-                        text = el.value || el.textContent;
-                    }
-                    
-                    if (navigator.clipboard && window.isSecureContext) {
-                        await navigator.clipboard.writeText(text);
-                        this.showToast('已複製！', 'success');
-                    } else {
-                        this.fallbackCopyTextToClipboard(text);
-                    }
-                } catch(e) {
-                    this.fallbackCopyTextToClipboard(document.getElementById(elementId).value || document.getElementById(elementId).textContent);
-                }
+                    let text = isValue ? document.getElementById(elementId).value : (document.getElementById(elementId).value || document.getElementById(elementId).textContent);
+                    if (navigator.clipboard && window.isSecureContext) { await navigator.clipboard.writeText(text); this.showToast('已複製！', 'success'); } 
+                    else this.fallbackCopyTextToClipboard(text);
+                } catch(e) { this.fallbackCopyTextToClipboard(document.getElementById(elementId).value || document.getElementById(elementId).textContent); }
             },
 
             async downloadDocx() {
                 if (!this.currentReport) return this.showToast('尚無報告', 'error'); 
                 this.showToast('產生 Word 中...', 'info');
-                
                 try {
-                    // 絕對防呆方案：捨棄脆弱的第三方套件，改用純原生 HTML 轉 Word (Blob 協議)，保證 100% 成功。
                     const r = this.currentReport; 
                     const safeStr = (val) => String(val || '無資料');
-                    const safeList = (arr) => {
-                        if (!arr || !Array.isArray(arr) || arr.length === 0) return '<li>無相關資料</li>';
-                        return arr.map(item => `<li style="margin-bottom: 8px;">${String(item)}</li>`).join('');
-                    };
+                    const safeList = (arr) => (!arr || !Array.isArray(arr) || arr.length === 0) ? '<li>無相關資料</li>' : arr.map(item => `<li style="margin-bottom: 8px;">${String(item)}</li>`).join('');
 
                     const htmlContent = `
                         <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-                        <head>
-                            <meta charset='utf-8'>
-                            <title>${this.currentTask?.title || "Persona Bloom 意象探索"}</title>
-                            <style>
-                                body { font-family: 'Microsoft JhengHei', 'Segoe UI', sans-serif; color: #333; line-height: 1.6; }
-                                h1 { color: #e11d48; border-bottom: 2px solid #e11d48; padding-bottom: 10px; }
-                                h2 { color: #0f172a; margin-top: 24px; background-color: #f8fafc; padding: 10px; }
-                                ul { padding-left: 20px; }
-                            </style>
-                        </head>
+                        <head><meta charset='utf-8'><title>${this.currentTask?.title || "Persona Bloom"}</title>
+                        <style>body { font-family: 'Microsoft JhengHei', sans-serif; color: #333; line-height: 1.6; } h1 { color: #e11d48; border-bottom: 2px solid #e11d48; padding-bottom: 10px; } h2 { color: #0f172a; margin-top: 24px; background-color: #f8fafc; padding: 10px; } ul { padding-left: 20px; }</style></head>
                         <body>
                             <h1>${this.currentTask?.title || "Persona Bloom 意象探索"}</h1>
                             <p style="text-align: right; color: #64748b;">測驗日期: ${new Date().toLocaleDateString()}</p>
-                            
-                            <h2>🌟 您的專屬意象</h2>
-                            <p style="font-size: 18px; font-weight: bold; color: #0f172a;">${safeStr(r.oneLineIdentity)}</p>
-                            <ul>
-                                <li><strong>🎨 外在顏色:</strong> ${safeStr(r.color?.name)} - ${safeStr(r.color?.meaning)}</li>
-                                <li><strong>🐾 行動動物:</strong> ${safeStr(r.animal?.name)} - ${safeStr(r.animal?.meaning)}</li>
-                                <li><strong>🌿 內在植物:</strong> ${safeStr(r.flower?.name)} - ${safeStr(r.flower?.meaning)}</li>
-                            </ul>
+                            <h2>🌟 您的專屬意象</h2><p style="font-size: 18px; font-weight: bold;">${safeStr(r.oneLineIdentity)}</p>
+                            <ul><li><strong>🎨 外在顏色:</strong> ${safeStr(r.color?.name)} - ${safeStr(r.color?.meaning)}</li><li><strong>🐾 行動動物:</strong> ${safeStr(r.animal?.name)} - ${safeStr(r.animal?.meaning)}</li><li><strong>🌿 內在植物:</strong> ${safeStr(r.flower?.name)} - ${safeStr(r.flower?.meaning)}</li></ul>
+                            <h2>🧠 綜合深度解析</h2><p>${safeStr(r.integratedNarrative).replace(/\n/g, '<br><br>')}</p>
+                            <h2>✨ 核心優勢與潛力</h2><ul>${safeList(r.strengths)}</ul>
+                            <h2>⚠️ 潛在盲點與壓力提醒</h2><ul>${safeList(r.watchouts)}</ul>
+                            <h2>💼 職場與人際建議</h2><ul>${safeList(r.workAndLearning)}</ul>
+                            <h2>🚀 專屬行動計畫</h2><ul>${safeList(r.actionPlan?.map(a => `<b>${a.action || '建議'}</b>: ${a.reason || '說明'}`))}</ul>
+                        </body></html>`;
 
-                            <h2>🧠 綜合深度解析</h2>
-                            <p>${safeStr(r.integratedNarrative).replace(/\n/g, '<br><br>')}</p>
-
-                            <h2>✨ 核心優勢與潛力</h2>
-                            <ul>${safeList(r.strengths)}</ul>
-
-                            <h2>⚠️ 潛在盲點與壓力提醒</h2>
-                            <ul>${safeList(r.watchouts)}</ul>
-
-                            <h2>💼 職場與人際建議</h2>
-                            <ul>${safeList(r.workAndLearning)}</ul>
-
-                            <h2>🚀 專屬行動計畫</h2>
-                            <ul>${safeList(r.actionPlan?.map(a => `<b>${a.action || '建議'}</b>: ${a.reason || '無說明'}`))}</ul>
-                        </body>
-                        </html>
-                    `;
-
-                    // 使用 Blob 協議生成 .doc 檔案
                     const blob = new Blob(['\ufeff', htmlContent], { type: 'application/msword' });
                     const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a'); 
-                    a.href = url; 
-                    a.download = `PersonaBloom_報告_${Date.now()}.doc`;
-                    document.body.appendChild(a); 
-                    a.click(); 
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                    
+                    const a = document.createElement('a'); a.href = url; a.download = `PersonaBloom_報告_${Date.now()}.doc`;
+                    document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
                     this.showToast('Word 下載成功！', 'success');
-                } catch (e) { 
-                    this.showToast('Word 產生發生錯誤', 'error'); 
-                    console.error(e);
-                }
+                } catch (e) { this.showToast('Word 產生失敗', 'error'); }
             },
 
             async generateFBPost() {
                 if (!this.currentReport) return; const apiKey = this.getApiKey(); if (!apiKey) return;
                 const btn = document.getElementById('btn-fb-post'); const oriHtml = btn.innerHTML; btn.innerHTML = '<i class="ph ph-spinner ph-spin mr-1"></i>生成中...';
                 try {
-                    const pt = `你是一位擅長社群行銷與爆款文案撰寫的專家。請根據使用者的「三重意象分析報告」，為他/她撰寫一篇極具吸引力的 Facebook 分享貼文。
-                    
-【撰寫要求】：
-1. 語氣設定：使用第一人稱（我），語氣要真實、活潑、充滿共鳴，帶點驚喜感，並恰到好處地使用合適的 Emoji。
-2. 貼文結構：
-   - 破冰開頭：用一句話吸引目光（例如：剛做了一個超特別的心理測驗...、沒想到我居然是...）。
-   - 核心結果：大方且驕傲地秀出專屬意象：「${this.currentReport.oneLineIdentity || '神秘特質'}」。
-   - 元素點評：精簡且巧妙地把測出的「顏色（${this.currentReport.color?.name || ''}）」、「動物（${this.currentReport.animal?.name || ''}）」與「植物（${this.currentReport.flower?.name || ''}）」串在一起，挑一句報告中最準確的優勢或特質來分享。
-   - 行動呼籲 (CTA)：結尾用輕鬆的問句邀請朋友一起來測（例如：有人也是這個組合嗎？你們覺得準嗎？）。
-3. 標籤要求：文末必須加上 #PersonaBloom #三重意象探索 #找到真實的自己
-4. 格式控制：字數控制在 150~200 字左右，請使用適當的換行（空行）讓排版舒適易讀。絕對不要提到你是 AI 或是任何 JSON 格式，直接輸出貼文內容。
-
-完整報告參考數據：
-${JSON.stringify(this.currentReport)}`;
-
+                    const pt = `你是一位擅長社群行銷的專家。請為使用者的「三重意象分析」撰寫 Facebook 貼文。\n\n【要求】：\n1. 用第一人稱（我），活潑、驚喜、使用 Emoji。\n2. 結構：破冰 -> 秀出意象「${this.currentReport.oneLineIdentity}」 -> 巧妙串連「${this.currentReport.color?.name}、${this.currentReport.animal?.name}、${this.currentReport.flower?.name}」並點評最準的特質 -> 結尾問句互動。\n3. 加上 #PersonaBloom #三重意象探索\n4. 約 150 字，舒適換行。勿提 AI 或 JSON。\n\n報告參考：${JSON.stringify(this.currentReport)}`;
                     const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${APP_CONFIG.models.analysis}:generateContent?key=${apiKey}`, {
                         method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: pt }] }] })
                     });
-                    const data = await res.json();
-                    if(data.error) throw new Error(data.error.message);
+                    const data = await res.json(); if(data.error) throw new Error(data.error.message);
                     const text = data.candidates[0].content.parts[0].text;
-                    
                     this.showCustomModal({
                         title: '<i class="ph-fill ph-facebook-logo text-blue-600 mr-2"></i>社群貼文預覽', desc: '預覽並複製以下內容，即可發布至社群媒體：',
                         confirmText: '<i class="ph ph-copy mr-1"></i> 複製貼文', confirmColor: 'bg-blue-600 hover:bg-blue-700',
@@ -971,8 +1051,8 @@ ${JSON.stringify(this.currentReport)}`;
                 document.getElementById('chat-history').innerHTML = `
                     <div class="flex gap-2 text-sm text-slate-600 mb-3 fade-in">
                         <i class="ph-fill ph-robot text-blue-500 mt-0.5 text-2xl"></i>
-                        <div class="bg-blue-50 p-3 rounded-tr-xl rounded-br-xl rounded-bl-sm border border-blue-100 shadow-sm leading-relaxed">
-                            您好！我是專屬 AI 教練。關於報告結果，您想深入探討如何應用在職場或人際上嗎？
+                        <div class="bg-blue-50 p-4 rounded-tr-xl rounded-br-xl rounded-bl-sm border border-blue-100 shadow-sm leading-relaxed">
+                            您好！我是專屬 AI 教練。關於這份意象報告，您想深入探討如何應用在職場或人際上嗎？
                         </div>
                     </div>`;
             },
@@ -995,7 +1075,7 @@ ${JSON.stringify(this.currentReport)}`;
                     const reply = (await res.json()).candidates[0].content.parts[0].text;
                     this.chatHistory.push({ role: "model", parts: [{ text: reply }] });
                     document.getElementById(lId).remove();
-                    cont.innerHTML += `<div class="flex gap-2 text-sm text-slate-600 mb-3 fade-in"><i class="ph-fill ph-robot text-blue-500 mt-0.5 text-2xl"></i><div class="bg-blue-50 p-3 rounded-tr-xl rounded-br-xl rounded-bl-sm border border-blue-100 leading-relaxed shadow-sm">${marked.parseInline(reply)}</div></div>`;
+                    cont.innerHTML += `<div class="flex gap-2 text-sm text-slate-600 mb-3 fade-in"><i class="ph-fill ph-robot text-blue-500 mt-0.5 text-2xl"></i><div class="bg-blue-50 p-4 rounded-tr-xl rounded-br-xl rounded-bl-sm border border-blue-100 leading-relaxed shadow-sm">${marked.parseInline(reply)}</div></div>`;
                     cont.scrollTop = cont.scrollHeight;
                 } catch (e) { document.getElementById(lId).remove(); this.showToast('聊天失敗', 'error'); this.chatHistory.pop(); }
             },
@@ -1024,11 +1104,13 @@ ${JSON.stringify(this.currentReport)}`;
                     snap.forEach(doc => {
                         const data = doc.data(); data.id = doc.id; this.historyData.push(data);
                         let dateStr = data.createdAt && typeof data.createdAt.toDate === 'function' ? data.createdAt.toDate().toLocaleString() : '-';
+                        let safeTitle = (data.title || '').replace(/'/g, "\\'"); // 防呆單引號
                         html += `<div class="bg-white p-5 rounded-xl border border-slate-100 shadow-sm flex justify-between items-center hover:shadow-md transition">
                                 <div><div class="font-bold text-slate-800 text-lg mb-1">${data.title}</div><div class="text-sm text-slate-500"><i class="ph ph-clock mr-1"></i>${dateStr}</div></div>
                                 <div class="flex gap-2">
-                                    <button onclick="App.viewHistory('${data.id}')" class="px-4 py-2 bg-slate-100 text-slate-600 font-bold text-sm rounded-lg hover:bg-slate-200 transition"><i class="ph-fill ph-eye"></i> 檢視</button>
-                                    <button onclick="App.deleteHistory('${data.id}')" class="px-4 py-2 bg-rose-50 text-rose-600 font-bold text-sm rounded-lg hover:bg-rose-100 transition"><i class="ph-fill ph-trash"></i> 刪除</button>
+                                    <button onclick="App.renameHistory('${data.id}', '${safeTitle}')" class="px-4 py-2 bg-blue-50 text-blue-600 font-bold text-sm rounded-lg hover:bg-blue-100 transition shadow-sm flex items-center"><i class="ph-fill ph-pencil-simple mr-1"></i> 改名</button>
+                                    <button onclick="App.viewHistory('${data.id}')" class="px-4 py-2 bg-slate-100 text-slate-600 font-bold text-sm rounded-lg hover:bg-slate-200 transition shadow-sm flex items-center"><i class="ph-fill ph-eye mr-1"></i> 檢視</button>
+                                    <button onclick="App.deleteHistory('${data.id}')" class="px-4 py-2 bg-rose-50 text-rose-600 font-bold text-sm rounded-lg hover:bg-rose-100 transition shadow-sm flex items-center"><i class="ph-fill ph-trash mr-1"></i> 刪除</button>
                                 </div>
                             </div>`;
                     }); list.innerHTML = html;
@@ -1043,12 +1125,33 @@ ${JSON.stringify(this.currentReport)}`;
                     confirmColor: 'bg-rose-600 hover:bg-rose-700',
                     onConfirm: async () => {
                         try {
+                            // 1. 刪除 Firestore 文字紀錄
                             await firebaseDb.collection('users').doc(this.currentUser.uid).collection('tasks').doc(taskId).delete();
-                            this.showToast('紀錄已成功刪除', 'success');
-                            this.loadHistory(); // 重新載入列表
-                        } catch (e) {
-                            this.showToast('刪除失敗：' + e.message, 'error');
-                        }
+                            // 2. 靜默刪除 Storage 雲端圖片，清出空間
+                            try { await firebase.storage().ref(`users/${this.currentUser.uid}/tasks/${taskId}_scene.webp`).delete(); } catch(e){}
+                            
+                            this.showToast('紀錄與雲端圖片已成功刪除', 'success');
+                            this.loadHistory(); 
+                        } catch (e) { this.showToast('刪除失敗', 'error'); }
+                    }
+                });
+            },
+
+            async renameHistory(taskId, currentTitle) {
+                this.showCustomModal({
+                    title: '<i class="ph-fill ph-pencil-simple text-blue-500 mr-2"></i>修改專案名稱',
+                    desc: '請輸入新的報告名稱：',
+                    requireInput: true,
+                    defaultValue: currentTitle,
+                    confirmText: '儲存變更',
+                    confirmColor: 'bg-blue-600 hover:bg-blue-700',
+                    onConfirm: async (newTitle) => {
+                        if (!newTitle) return this.showToast('名稱不能為空', 'warning');
+                        try {
+                            await firebaseDb.collection('users').doc(this.currentUser.uid).collection('tasks').doc(taskId).update({ title: newTitle });
+                            this.showToast('名稱已更新', 'success');
+                            this.loadHistory(); 
+                        } catch (e) { this.showToast('更新失敗', 'error'); }
                     }
                 });
             },
@@ -1069,21 +1172,24 @@ ${JSON.stringify(this.currentReport)}`;
                         let date = u.createdAt && typeof u.createdAt.toDate === 'function' ? u.createdAt.toDate().toLocaleDateString() : '-';
                         let rHtml = `<span class="px-2 py-1 bg-slate-100 text-xs rounded-md font-bold text-slate-600">${role}</span>`; if (isDel) rHtml += ` <span class="px-2 py-1 bg-rose-100 text-xs rounded-md font-bold text-rose-600">已停用</span>`;
                         html += `<tr class="border-b border-slate-100 hover:bg-slate-50 transition"><td class="p-4">${u.email}</td><td class="p-4">${u.realName||'未提供'}</td><td class="p-4">${rHtml}</td><td class="p-4 text-slate-400">${date}</td><td class="p-4">`;
-                        if (role === 'CREATOR' || u.email === APP_CONFIG.creatorEmail) html += '<span class="text-xs text-slate-400 font-bold">創作者保護</span>';
+                        if (role === 'CREATOR' || u.email === APP_CONFIG.creatorEmail) html += '<span class="text-xs text-slate-400 font-bold">系統核心保護</span>';
                         else {
                             html += `<div class="flex gap-2"><button onclick="App.adminActionRole('${uid}','${u.email}','${role}')" class="px-3 py-1.5 bg-blue-50 text-blue-600 rounded-lg hover:bg-blue-100 text-xs font-bold">變更</button>
                                 ${!isDel ? `<button onclick="App.adminActionDelete('${uid}','${u.email}')" class="px-3 py-1.5 bg-rose-50 text-rose-600 rounded-lg hover:bg-rose-100 text-xs font-bold">刪除</button>` : `<button onclick="App.adminActionRestore('${uid}','${u.email}')" class="px-3 py-1.5 bg-emerald-50 text-emerald-600 rounded-lg hover:bg-emerald-100 text-xs font-bold">恢復</button>`}</div>`;
                         }
                         html += '</td></tr>';
                     }); tbody.innerHTML = html;
-                } catch (e) { tbody.innerHTML = `<tr><td colspan="5" class="text-center text-rose-500 py-10">權限不足或缺少索引。錯誤: ${e.message}</td></tr>`; }
+                } catch (e) { tbody.innerHTML = `<tr><td colspan="5" class="text-center text-rose-500 py-10">權限不足。需設定正確 Firestore Rules。錯誤: ${e.message}</td></tr>`; }
             },
             adminActionRole: function(uid, email, r) {
                 const nRole = r === 'ADMIN' ? 'user' : 'admin';
                 this.showCustomModal({ title: '變更權限', desc: `確定變更 <strong>${email}</strong> 為 ${nRole}？`, confirmText: '確定', confirmColor: 'bg-blue-600 hover:bg-blue-700', onConfirm: async () => { try { await firebaseDb.collection('users').doc(uid).update({ role: nRole }); this.showToast('已更新', 'success'); this.loadAdmin(); } catch(e){ this.showToast('失敗', 'error'); } } });
             },
             adminActionDelete: function(uid, email) {
-                this.showCustomModal({ title: '刪除會員', desc: `刪除 <strong>${email}</strong>。輸入 Email 確認：`, requireInput: true, expectedInput: email, confirmText: '刪除', confirmColor: 'bg-rose-600 hover:bg-rose-700', onConfirm: async () => { try { await firebaseDb.collection('users').doc(uid).update({ status: 'deleted' }); this.showToast('已刪除', 'success'); this.loadAdmin(); } catch(e){ this.showToast('失敗', 'error'); } } });
+                this.showCustomModal({ title: '刪除會員', desc: `停用 <strong>${email}</strong>。請輸入 Email 確認：`, requireInput: true, expectedInput: email, placeholder: email, confirmText: '刪除', confirmColor: 'bg-rose-600 hover:bg-rose-700', onConfirm: async (inputVal) => { 
+                    if (inputVal !== email) return this.showToast('輸入不相符', 'error');
+                    try { await firebaseDb.collection('users').doc(uid).update({ status: 'deleted' }); this.showToast('已刪除', 'success'); this.loadAdmin(); } catch(e){ this.showToast('失敗', 'error'); } 
+                } });
             },
             adminActionRestore: function(uid, email) {
                 this.showCustomModal({ title: '恢復會員', desc: `恢復 <strong>${email}</strong>？`, confirmText: '恢復', confirmColor: 'bg-emerald-600 hover:bg-emerald-700', onConfirm: async () => { try { await firebaseDb.collection('users').doc(uid).update({ status: 'active' }); this.showToast('已恢復', 'success'); this.loadAdmin(); } catch(e){ this.showToast('失敗', 'error'); } } });
@@ -1093,12 +1199,26 @@ ${JSON.stringify(this.currentReport)}`;
                 const m = document.getElementById('custom-modal');
                 document.getElementById('custom-modal-title').innerHTML = opt.title; document.getElementById('custom-modal-desc').innerHTML = opt.desc;
                 const ic = document.getElementById('custom-modal-input-container'); const ie = document.getElementById('custom-modal-input');
-                if (opt.requireInput) { ic.classList.remove('hidden'); ie.value = ''; ie.placeholder = opt.expectedInput; } else ic.classList.add('hidden');
+                
+                // 處理 Enter 鍵直接觸發送出
+                ie.onkeypress = (e) => { if (e.key === 'Enter') document.getElementById('custom-modal-confirm').click(); };
+
+                if (opt.requireInput) { 
+                    ic.classList.remove('hidden'); 
+                    ie.value = opt.defaultValue || ''; 
+                    ie.placeholder = opt.placeholder || ''; 
+                    setTimeout(() => ie.focus(), 100);
+                } else { ic.classList.add('hidden'); ie.value = ''; }
+                
                 const hc = document.getElementById('custom-modal-html-container');
                 if (opt.htmlContent) { hc.classList.remove('hidden'); hc.innerHTML = opt.htmlContent; } else hc.classList.add('hidden');
+                
                 const btn = document.getElementById('custom-modal-confirm');
                 btn.className = `px-5 py-2.5 rounded-xl font-bold transition text-white shadow-md ${opt.confirmColor}`; btn.innerHTML = opt.confirmText;
-                btn.onclick = () => { if (opt.requireInput && ie.value.trim() !== opt.expectedInput) return this.showToast('Email 錯誤', 'error'); m.classList.add('hidden'); if (opt.onConfirm) opt.onConfirm(); };
+                btn.onclick = () => { 
+                    m.classList.add('hidden'); 
+                    if (opt.onConfirm) opt.onConfirm(ie.value.trim()); 
+                };
                 m.classList.remove('hidden');
             }
         };
