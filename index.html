@@ -556,6 +556,74 @@
             isAuthProcessing: false, hasSetupAuthListener: false, 
             qLoadingInterval: null, rLoadingInterval: null, 
 
+            // --- 企業級 API 防呆、指數輪詢重試與模型備援機制 ---
+            async fetchGeminiWithRetry(model, apiKey, payload, uiUpdater) {
+                let attempt = 0;
+                const maxRetries = 3;
+
+                const updateUI = (msg) => {
+                    console.warn(msg); // 讓開發者 Console 有紀錄
+                    if (typeof uiUpdater === 'function') uiUpdater(msg);
+                    else App.showToast(msg, 'warning'); // 若沒有指定 UI 元素，則用 Toast 提示
+                };
+
+                const executeRequest = async (targetModel) => {
+                    return await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${targetModel}:generateContent?key=${apiKey}`, {
+                        method: 'POST', headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(payload)
+                    });
+                };
+
+                while (attempt <= maxRetries) {
+                    let response;
+                    try {
+                        response = await executeRequest(model);
+                    } catch (netErr) {
+                        throw new Error("網路連線異常，請檢查網路環境與跨網域設定");
+                    }
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        if (data.error) throw new Error(data.error.message);
+                        return data;
+                    }
+
+                    // 條件 1: 僅捕捉 429 進行重試
+                    if (response.status === 429) {
+                        if (attempt < maxRetries) {
+                            attempt++;
+                            const delay = Math.pow(2, attempt) * 1000; // 指數遞增: 2s, 4s, 8s
+                            updateUI(`伺服器忙碌中，正在進行第 ${attempt} 次重試...`);
+                            await new Promise(r => setTimeout(r, delay));
+                            continue;
+                        } else {
+                            // 條件 5: 三次皆 429 失敗，執行備援模型 (TTS 語音無 3.5 備援)
+                            if (model === APP_CONFIG.models.analysis || model === APP_CONFIG.models.chat) {
+                                updateUI(`系統滿載，已切換至備援模型執行`);
+                                const fallbackRes = await executeRequest('gemini-3.5-flash');
+                                if (fallbackRes.ok) {
+                                    const fbData = await fallbackRes.json();
+                                    if (fbData.error) throw new Error(fbData.error.message);
+                                    return fbData;
+                                }
+                                throw new Error(`備援模型 (gemini-3.5-flash) 亦發生錯誤 (${fallbackRes.status})`);
+                            }
+                            throw new Error("請求頻率過高 (429)，重試皆失敗，請稍後再試");
+                        }
+                    } 
+                    // 條件 3: 非 429 錯誤立即中斷，拋出清晰訊息
+                    else if (response.status === 400) {
+                        throw new Error("參數錯誤 (400)，請檢查傳遞之資料格式");
+                    } else if (response.status === 401) {
+                        throw new Error("未授權 (401)，您的 API Key 無效或已過期");
+                    } else if (response.status === 403) {
+                        throw new Error("權限拒絕 (403)，請確認 API Key 的使用權限或地區限制");
+                    } else {
+                        throw new Error(`伺服器發生異常 (${response.status})`);
+                    }
+                }
+            },
+
             togglePassword(inputId, iconEl) {
                 const el = document.getElementById(inputId);
                 if (el.type === 'password') {
@@ -756,9 +824,11 @@
                     } 
                     catch (e) {
                         attempt++;
-                        if (attempt >= 2) {
+                        // 攔截到致命錯誤(400/401/403)時，立刻強制中止不必要的外部重試迴圈
+                        if (attempt >= 2 || e.message.includes('(400)') || e.message.includes('(401)') || e.message.includes('(403)')) {
                             document.getElementById('q-error-state').classList.remove('hidden');
                             document.getElementById('q-error-text').textContent = "系統防呆攔截：" + (e.message || '連線異常');
+                            attempt = 99; 
                         }
                     } finally { if(attempt>=2 || this.activeQuestions.length>0){ clearInterval(this.qLoadingInterval); document.getElementById('q-loading-state').classList.add('hidden');} }
                 }
@@ -791,13 +861,9 @@
                     else parts.push({ text: `【附件 ${f.name}】\n${f.data}` });
                 });
 
-                const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${APP_CONFIG.models.analysis}:generateContent?key=${apiKey}`, {
-                    method: 'POST', headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ contents: [{ parts: parts }], generationConfig: { responseMimeType: "application/json", maxOutputTokens: 8192 } })
-                });
-                
-                const data = await res.json(); 
-                if (data.error) throw new Error(data.error.message);
+                const payload = { contents: [{ parts: parts }], generationConfig: { responseMimeType: "application/json", maxOutputTokens: 8192 } };
+                const uiUpdater = (msg) => { const el = document.getElementById('q-loading-text'); if(el) el.textContent = msg; };
+                const data = await this.fetchGeminiWithRetry(APP_CONFIG.models.analysis, apiKey, payload, uiUpdater);
                 
                 let rawText = data.candidates[0].content.parts[0].text;
                 rawText = rawText.replace(/[\x00-\x1F]+/g, ""); // 拔除隱形控制字元
@@ -871,12 +937,9 @@
                 let attempt = 0;
                 while (attempt < 2) {
                     try {
-                        const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${APP_CONFIG.models.analysis}:generateContent?key=${apiKey}`, {
-                            method: 'POST', headers: { 'Content-Type': 'application/json' },
-                            body: JSON.stringify({ contents: [{ parts: parts }], generationConfig: { responseMimeType: "application/json", maxOutputTokens: 8192 } })
-                        });
-                        const data = await res.json(); 
-                        if (data.error) throw new Error(data.error.message);
+                        const payload = { contents: [{ parts: parts }], generationConfig: { responseMimeType: "application/json", maxOutputTokens: 8192 } };
+                        const uiUpdater = (msg) => { const el = document.getElementById('res-ai-loading-text'); if(el) el.textContent = msg; };
+                        const data = await this.fetchGeminiWithRetry(APP_CONFIG.models.analysis, apiKey, payload, uiUpdater);
                         
                         let rawText = data.candidates[0].content.parts[0].text;
                         rawText = rawText.replace(/[\x00-\x1F]+/g, ""); 
@@ -901,11 +964,13 @@
                         return;
                     } catch (e) { 
                         attempt++; 
-                        if(attempt>=2) { 
+                        // 攔截到致命錯誤(400/401/403)時，立即跳出不再浪費 API 額度
+                        if(attempt>=2 || e.message.includes('(400)') || e.message.includes('(401)') || e.message.includes('(403)')) { 
                             clearInterval(this.rLoadingInterval); 
                             document.getElementById('res-ai-loading').classList.add('hidden'); 
                             document.getElementById('res-error-state').classList.remove('hidden'); 
                             document.getElementById('res-error-text').textContent = "系統防呆攔截：" + e.message; 
+                            break; 
                         } 
                     }
                 }
@@ -1041,10 +1106,11 @@
                 const btn = document.getElementById('btn-fb-post'); const oriHtml = btn.innerHTML; btn.innerHTML = '<i class="ph ph-spinner ph-spin mr-1"></i>生成中...';
                 try {
                     const pt = `你是一位擅長社群行銷的專家。請為使用者的「三重意象分析」撰寫 Facebook 貼文。\n\n【要求】：\n1. 用第一人稱（我），活潑、驚喜、使用 Emoji。\n2. 結構：破冰 -> 秀出意象「${this.currentReport.oneLineIdentity}」 -> 巧妙串連「${this.currentReport.color?.name}、${this.currentReport.animal?.name}、${this.currentReport.flower?.name}」並點評最準的特質 -> 結尾問句互動。\n3. 加上 #PersonaBloom #三重意象探索\n4. 約 150 字，舒適換行。勿提 AI 或 JSON。\n\n報告參考：${JSON.stringify(this.currentReport)}`;
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${APP_CONFIG.models.analysis}:generateContent?key=${apiKey}`, {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ contents: [{ parts: [{ text: pt }] }] })
-                    });
-                    const data = await res.json(); if(data.error) throw new Error(data.error.message);
+                    
+                    const payload = { contents: [{ parts: [{ text: pt }] }] };
+                    const uiUpdater = (msg) => { btn.innerHTML = `<i class="ph ph-spinner ph-spin mr-1"></i>${msg}`; };
+                    const data = await this.fetchGeminiWithRetry(APP_CONFIG.models.analysis, apiKey, payload, uiUpdater);
+                    
                     const text = data.candidates[0].content.parts[0].text;
                     this.showCustomModal({
                         title: '<i class="ph-fill ph-facebook-logo text-blue-600 mr-2"></i>社群貼文預覽', desc: '預覽並複製以下內容，即可發布至社群媒體：',
@@ -1060,11 +1126,12 @@
                 const btn = document.getElementById('btn-tts'); const oriHtml = btn.innerHTML; btn.innerHTML = '<i class="ph ph-spinner-gap ph-spin mr-2 text-lg"></i>AI 語音生成中...'; btn.disabled = true;
                 try {
                     const text = `您的專屬意象是：${this.currentReport.oneLineIdentity}。${this.currentReport.summary}`;
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${APP_CONFIG.models.tts}:generateContent?key=${apiKey}`, {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' }, 
-                        body: JSON.stringify({ contents: [{ parts: [{ text: text }] }], generationConfig: { responseModalities: ["AUDIO"] } })
-                    });
-                    const audioData = (await res.json())?.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
+                    
+                    const payload = { contents: [{ parts: [{ text: text }] }], generationConfig: { responseModalities: ["AUDIO"] } };
+                    const uiUpdater = (msg) => { btn.innerHTML = `<i class="ph ph-spinner-gap ph-spin mr-2 text-lg"></i>${msg}`; };
+                    const data = await this.fetchGeminiWithRetry(APP_CONFIG.models.tts, apiKey, payload, uiUpdater);
+                    
+                    const audioData = data?.candidates?.[0]?.content?.parts?.[0]?.inlineData?.data;
                     if (audioData) {
                         const pcm16 = new Int16Array(Uint8Array.from(atob(audioData), c => c.charCodeAt(0)).buffer);
                         const numCh = 1; const sr = 24000; const br = sr * numCh * 2; const ba = numCh * 2; const buf = new ArrayBuffer(44 + pcm16.byteLength); const view = new DataView(buf);
@@ -1099,11 +1166,12 @@
                 cont.scrollTop = cont.scrollHeight; this.chatHistory.push({ role: "user", parts: [{ text: txt }] });
                 try {
                     const sys = `你是一位專業同理的心理教練。請根據報告提供建議。\n報告：${JSON.stringify(this.currentReport)}`;
-                    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${APP_CONFIG.models.chat}:generateContent?key=${apiKey}`, {
-                        method: 'POST', headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ contents: this.chatHistory, systemInstruction: { parts: [{ text: sys }] } })
-                    });
-                    const reply = (await res.json()).candidates[0].content.parts[0].text;
+                    
+                    const payload = { contents: this.chatHistory, systemInstruction: { parts: [{ text: sys }] } };
+                    const uiUpdater = (msg) => { const el = document.getElementById(lId); if (el) el.querySelector('div').innerHTML = `<i class="ph ph-spinner-gap ph-spin text-lg"></i> ${msg}`; };
+                    const data = await this.fetchGeminiWithRetry(APP_CONFIG.models.chat, apiKey, payload, uiUpdater);
+                    
+                    const reply = data.candidates[0].content.parts[0].text;
                     this.chatHistory.push({ role: "model", parts: [{ text: reply }] });
                     document.getElementById(lId).remove();
                     cont.innerHTML += `<div class="flex gap-2 text-sm text-slate-600 mb-3 fade-in"><i class="ph-fill ph-robot text-blue-500 mt-0.5 text-2xl"></i><div class="bg-blue-50 p-4 rounded-tr-xl rounded-br-xl rounded-bl-sm border border-blue-100 leading-relaxed shadow-sm">${marked.parseInline(reply)}</div></div>`;
