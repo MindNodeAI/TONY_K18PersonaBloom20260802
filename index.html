@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Persona Bloom - 三重意象人格探索</title>
+    <title>Persona Bloom - 三重意象人格探索 | TONY STUDIO</title>
     
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/@phosphor-icons/web"></script>
@@ -56,6 +56,7 @@
 
     <main id="main-content" class="flex-grow w-full max-w-5xl mx-auto p-4 sm:p-6 pb-20">
         
+        <!-- Auth View -->
         <div id="view-auth" class="max-w-md mx-auto bg-white rounded-2xl shadow-xl border border-slate-100 overflow-hidden mt-10">
             <div class="p-8">
                 <div class="text-center mb-8">
@@ -123,6 +124,7 @@
             </div>
         </div>
 
+        <!-- Dashboard View -->
         <div id="view-dashboard" class="hidden fade-in space-y-6">
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
                 <div class="flex items-start gap-4">
@@ -139,7 +141,7 @@
                         <p class="text-sm text-slate-500 mb-4">系統升級採用最新 <strong>Gemini 3.8 Flash</strong>。請輸入您的金鑰以解鎖分析。</p>
                         <div class="flex gap-2 relative">
                             <div class="relative flex-grow">
-                                <input type="password" id="api-key-input" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm pr-12" placeholder="輸入金鑰 (例如：AQ... 或 AIza...)">
+                                <input type="password" id="api-key-input" class="w-full px-4 py-3 bg-slate-50 border border-slate-200 rounded-xl outline-none focus:ring-2 focus:ring-blue-500 font-mono text-sm pr-12" placeholder="貼上您的金鑰 (無論是 AIza 或 AQ 開頭皆可)">
                                 <button type="button" onclick="App.togglePassword('api-key-input', this.querySelector('i'))" class="absolute inset-y-0 right-0 flex items-center pr-4 text-slate-400 hover:text-slate-600 transition">
                                     <i class="ph ph-eye text-xl"></i>
                                 </button>
@@ -237,6 +239,7 @@
             </div>
         </div>
 
+        <!-- Task Form View -->
         <div id="view-task-form" class="hidden fade-in max-w-2xl mx-auto">
             <button onclick="App.navigate('dashboard')" class="mb-4 text-slate-500 hover:text-slate-800 flex items-center gap-1 font-medium transition"><i class="ph ph-arrow-left"></i>返回首頁</button>
             <div class="bg-white rounded-2xl shadow-sm border border-slate-100 p-6 sm:p-8">
@@ -292,6 +295,7 @@
             </div>
         </div>
 
+        <!-- Questionnaire View -->
         <div id="view-questionnaire" class="hidden fade-in max-w-3xl mx-auto">
             <div id="q-loading-state" class="hidden bg-white rounded-2xl shadow-sm border border-slate-100 p-16 text-center">
                 <i class="ph ph-sparkle ph-spin text-5xl text-rose-500 mb-6 block mx-auto"></i>
@@ -301,7 +305,7 @@
 
             <div id="q-error-state" class="hidden bg-white rounded-2xl shadow-sm border border-rose-100 p-8 text-center">
                 <i class="ph-fill ph-warning-circle text-5xl text-rose-500 mb-4 block mx-auto"></i>
-                <h3 class="text-xl font-bold text-slate-800 mb-2">網路或格式異常</h3>
+                <h3 class="text-xl font-bold text-slate-800 mb-2">發生異常</h3>
                 <p id="q-error-text" class="text-slate-600 text-sm mb-6"></p>
                 <button onclick="App.fallbackToStandardQuestions()" class="px-6 py-3 bg-slate-900 text-white rounded-xl font-bold hover:bg-slate-800 transition shadow-md">
                     切換至標準題庫繼續測驗
@@ -317,6 +321,7 @@
             </div>
         </div>
 
+        <!-- Result View -->
         <div id="view-result" class="hidden fade-in max-w-5xl mx-auto">
             <button onclick="App.navigate('dashboard')" class="mb-4 text-slate-500 hover:text-slate-800 flex items-center gap-1 font-medium transition"><i class="ph ph-arrow-left"></i>返回首頁</button>
             
@@ -423,12 +428,14 @@
             </div>
         </div>
 
+        <!-- History View -->
         <div id="view-history" class="hidden fade-in max-w-4xl mx-auto">
             <button onclick="App.navigate('dashboard')" class="mb-4 text-slate-500 hover:text-slate-800 flex items-center gap-1 font-medium transition"><i class="ph ph-arrow-left"></i>返回首頁</button>
             <h2 class="text-2xl font-bold mb-6 text-slate-800 flex items-center gap-2"><i class="ph-fill ph-books text-blue-500"></i> 探索紀錄</h2>
             <div id="history-list" class="space-y-4"></div>
         </div>
 
+        <!-- Admin View -->
         <div id="view-admin" class="hidden fade-in max-w-5xl mx-auto">
             <button onclick="App.navigate('dashboard')" class="mb-4 text-slate-500 hover:text-slate-800 flex items-center gap-1 font-medium transition"><i class="ph ph-arrow-left"></i>返回首頁</button>
             <div class="bg-white p-6 rounded-2xl shadow-sm border border-slate-100">
@@ -444,6 +451,7 @@
             </div>
         </div>
 
+        <!-- Guide / Whitepaper View -->
         <div id="view-guide" class="hidden fade-in max-w-4xl mx-auto space-y-6">
             <button onclick="App.navigate('dashboard')" class="mb-2 text-slate-500 hover:text-slate-800 flex items-center gap-1 font-medium transition"><i class="ph ph-arrow-left"></i>返回首頁</button>
             
@@ -510,11 +518,11 @@
     </footer>
 
     <script>
-        // 核心設定：升級為 Gemini 3.8 Flash
         const APP_CONFIG = {
             creatorEmail: "mindnodeai@gmail.com",
             models: {
                 analysis: "gemini-3.8-flash",
+                fallback: "gemini-3.5-flash",
                 chat: "gemini-3.8-flash", 
                 tts: "gemini-2.5-flash-preview-tts" 
             }
@@ -540,31 +548,48 @@
             { id: "q3", text: "面對突如其來的批評，你第一時間的內在反應是？", options: [{ text: "分析對方說得有沒有道理", type: "ANA" }, { text: "感到受傷，但試著理解對方的感受", type: "WARM" }, { text: "立刻反駁，並提出自己的觀點", type: "ENG" }, { text: "先冷處理，等自己情緒平復再說", type: "RES" }] },
             { id: "q4", text: "接手一個完全陌生的全新專案，你會如何開始？", options: [{ text: "建立詳細的時程表和計畫大綱", type: "STR" }, { text: "馬上動手做一些雛形，從錯誤中學習", type: "EXP" }, { text: "召集相關人員開會，腦力激盪", type: "ENG" }, { text: "蒐集大量案例與數據，研究最佳解", type: "ANA" }] },
             { id: "q5", text: "面對高度壓力的死線，你通常會如何應對？", options: [{ text: "嚴格照表操課，排除一切干擾", type: "STR" }, { text: "尋找更有效率的分析捷徑", type: "ANA" }, { text: "尋求團隊夥伴的分工與協助", type: "WARM" }, { text: "燃起鬥志，激勵大家一起衝刺", type: "ENG" }] },
-            { id: "q6", text: "參加大型社交聚會時，你的常態是？", options: [{ text: "穿梭全場，主動認識新朋友", type: "ENG" }, { text: "待在角落，只跟熟人說話", type: "RES" }, { text: "關心那些看起來落單的人", type: "WARM" }, { text: "覺得有趣，探索各種新奇的活動", type: "EXP" }] },
-            { id: "q7", text: "學習一項全新技能時，你偏好的方式是？", options: [{ text: "閱讀理論，理解底層邏輯", type: "ANA" }, { text: "直接實作，隨性摸索", type: "EXP" }, { text: "報名有系統的步驟課程", type: "STR" }, { text: "找同好一起討論學習", type: "ENG" }] },
-            { id: "q8", text: "當團隊發生激烈衝突時，你第一時間會？", options: [{ text: "居中協調，緩和雙方情緒", type: "WARM" }, { text: "不介入，等他們自己冷靜", type: "RES" }, { text: "客觀分析雙方的論點與事實", type: "ANA" }, { text: "大聲表態，直接介入爭論", type: "ENG" }] },
-            { id: "q9", text: "構思未來的職涯發展時，你最看重？", options: [{ text: "穩定的晉升管道與制度", type: "STR" }, { text: "充滿變數與創新的舞台", type: "EXP" }, { text: "能幫助他人、有意義的工作", type: "WARM" }, { text: "能發揮專業、解決困難問題", type: "ANA" }] },
-            { id: "q10", text: "發現既有流程出現嚴重漏洞時，你會？", options: [{ text: "撰寫詳細報告分析原因", type: "ANA" }, { text: "提出顛覆傳統的全新做法", type: "EXP" }, { text: "制定更嚴謹的新規範", type: "STR" }, { text: "召集大家討論如何改善", type: "WARM" }] },
-            { id: "q11", text: "如果獲得一筆意外之財，你最可能怎麼運用？", options: [{ text: "規劃儲蓄與穩健投資", type: "STR" }, { text: "馬上訂機票去沒去過的地方", type: "EXP" }, { text: "辦派對請所有人大吃一頓", type: "ENG" }, { text: "低調存起來，什麼也不說", type: "RES" }] },
-            { id: "q12", text: "一天結束後，你最理想的放鬆方式是？", options: [{ text: "完全放空，不想講話", type: "RES" }, { text: "跟家人朋友聊聊今天發生的事", type: "WARM" }, { text: "去運動或聚餐發洩精力", type: "ENG" }, { text: "整理思緒，規劃明天的代辦清單", type: "ANA" }] }
+            { id: "q6", text: "參加大型社交聚會時，你的常態是？", options: [{ text: "穿梭全場，主動認識新朋友", type: "ENG" }, { text: "待在角落，只跟熟人說話", type: "RES" }, { text: "關心那些看起來落單的人", type: "WARM" }, { text: "覺得有趣，探索各種新奇的活動", type: "EXP" }] }
         ];
 
         const App = {
             currentUser: null, apiKeyCache: '', currentTask: null, currentQuestionIndex: 0,
-            activeQuestions: [], taskFiles: [], currentReport: null,
-            currentFeedbackRating: 0, chatHistory: [], historyData: [],
+            activeQuestions: [], taskFiles: [], currentReport: null, currentFeedbackRating: 0, chatHistory: [], historyData: [],
             isAuthProcessing: false, hasSetupAuthListener: false, 
             qLoadingInterval: null, rLoadingInterval: null, 
 
-            // --- 企業級 API 防呆、指數輪詢重試與模型備援機制 ---
+            // --- 企業級容錯解析器 (Self-Healing JSON) ---
+            robustJSONParse: function(rawText, expectedType = 'object') {
+                try {
+                    // 1. 去除首尾空白與 Markdown 代碼塊標記 (```json ... ```)
+                    let text = rawText.replace(/^```(json)?|```$/gi, '').trim();
+                    
+                    // 2. 自動定位有效的 JSON 結構符號
+                    let startIndex = expectedType === 'array' ? text.indexOf('[') : text.indexOf('{');
+                    let endIndex = expectedType === 'array' ? text.lastIndexOf(']') : text.lastIndexOf('}');
+                    
+                    if (startIndex === -1 || endIndex === -1) throw new Error("找不到有效的 JSON 結構符號");
+                    
+                    let jsonStr = text.substring(startIndex, endIndex + 1);
+                    
+                    // 3. 剔除可能導致解析崩潰的隱形控制字元
+                    jsonStr = jsonStr.replace(/[\x00-\x1F]+/g, "");
+                    
+                    return JSON.parse(jsonStr);
+                } catch (e) {
+                    console.error("[RobustParse Error]", e, "Raw Text:", rawText);
+                    throw new Error("模型回傳格式無法自動修復，請重試。");
+                }
+            },
+
+            // --- 指數輪詢、自動重試與模型備援機制 ---
             async fetchGeminiWithRetry(model, apiKey, payload, uiUpdater) {
                 let attempt = 0;
                 const maxRetries = 3;
 
                 const updateUI = (msg) => {
-                    console.warn(msg); // 讓開發者 Console 有紀錄
+                    console.warn(msg);
                     if (typeof uiUpdater === 'function') uiUpdater(msg);
-                    else App.showToast(msg, 'warning'); // 若沒有指定 UI 元素，則用 Toast 提示
+                    else App.showToast(msg, 'warning');
                 };
 
                 const executeRequest = async (targetModel) => {
@@ -579,7 +604,7 @@
                     try {
                         response = await executeRequest(model);
                     } catch (netErr) {
-                        throw new Error("網路連線異常，請檢查網路環境與跨網域設定");
+                        throw new Error("網路連線異常，請檢查您的網路環境。");
                     }
 
                     if (response.ok) {
@@ -588,50 +613,47 @@
                         return data;
                     }
 
-                    // 條件 1: 僅捕捉 429 進行重試
+                    // 規則 1 & 2: 僅針對 429 錯誤觸發指數輪詢重試 (Exponential Backoff)
                     if (response.status === 429) {
                         if (attempt < maxRetries) {
                             attempt++;
                             const delay = Math.pow(2, attempt) * 1000; // 指數遞增: 2s, 4s, 8s
                             updateUI(`伺服器忙碌中，正在進行第 ${attempt} 次重試...`);
                             await new Promise(r => setTimeout(r, delay));
-                            continue;
+                            continue; // 繼續下一輪迴圈
                         } else {
-                            // 條件 5: 三次皆 429 失敗，執行備援模型 (TTS 語音無 3.5 備援)
+                            // 規則 5: 重試 3 次皆 429 失敗，觸發備援模型切換
                             if (model === APP_CONFIG.models.analysis || model === APP_CONFIG.models.chat) {
                                 updateUI(`系統滿載，已切換至備援模型執行`);
-                                const fallbackRes = await executeRequest('gemini-3.5-flash');
+                                const fallbackRes = await executeRequest(APP_CONFIG.models.fallback);
                                 if (fallbackRes.ok) {
                                     const fbData = await fallbackRes.json();
                                     if (fbData.error) throw new Error(fbData.error.message);
                                     return fbData;
                                 }
-                                throw new Error(`備援模型 (gemini-3.5-flash) 亦發生錯誤 (${fallbackRes.status})`);
+                                throw new Error(`備援模型 (${APP_CONFIG.models.fallback}) 亦發生頻率限制 (${fallbackRes.status})`);
                             }
-                            throw new Error("請求頻率過高 (429)，重試皆失敗，請稍後再試");
+                            throw new Error("請求頻率過高 (429)，且無備援方案可用。請稍後再試。");
                         }
                     } 
-                    // 條件 3: 非 429 錯誤立即中斷，拋出清晰訊息
-                    else if (response.status === 400) {
-                        throw new Error("參數錯誤 (400)，請檢查傳遞之資料格式");
-                    } else if (response.status === 401) {
-                        throw new Error("未授權 (401)，您的 API Key 無效或已過期");
-                    } else if (response.status === 403) {
-                        throw new Error("權限拒絕 (403)，請確認 API Key 的使用權限或地區限制");
-                    } else {
-                        throw new Error(`伺服器發生異常 (${response.status})`);
+                    // 規則 3: 非 429 的嚴重錯誤，立即中斷重試並拋出清晰錯誤
+                    else {
+                        let errMsg = `伺服器異常 (${response.status})`;
+                        if (response.status === 400) errMsg = "參數錯誤 (400)，請檢查輸入的內容格式。";
+                        if (response.status === 401) errMsg = "未授權 (401)，您的 API Key 無效或已過期。";
+                        if (response.status === 403) errMsg = "權限拒絕 (403)，請確認 API Key 的使用權限或地區限制。";
+                        throw new Error(errMsg);
                     }
                 }
             },
 
+            /* --- UI 工具與核心流程 --- */
             togglePassword(inputId, iconEl) {
                 const el = document.getElementById(inputId);
                 if (el.type === 'password') {
-                    el.type = 'text';
-                    iconEl.classList.replace('ph-eye', 'ph-eye-slash');
+                    el.type = 'text'; iconEl.classList.replace('ph-eye', 'ph-eye-slash');
                 } else {
-                    el.type = 'password';
-                    iconEl.classList.replace('ph-eye-slash', 'ph-eye');
+                    el.type = 'password'; iconEl.classList.replace('ph-eye-slash', 'ph-eye');
                 }
             },
 
@@ -650,8 +672,7 @@
 
             navigate(viewId) {
                 ['view-auth', 'view-dashboard', 'view-task-form', 'view-questionnaire', 'view-result', 'view-history', 'view-admin', 'view-guide'].forEach(v => {
-                    const el = document.getElementById(v);
-                    if (el) el.classList.add('hidden');
+                    const el = document.getElementById(v); if (el) el.classList.add('hidden');
                 });
                 const target = document.getElementById('view-' + viewId);
                 if (target) target.classList.remove('hidden');
@@ -688,6 +709,7 @@
                 this.showToast('請先於首頁輸入 Gemini API Key', 'error'); return null;
             },
 
+            /* --- Firebase Auth --- */
             setupAuthListener() {
                 if (this.hasSetupAuthListener) return; this.hasSetupAuthListener = true;
                 firebaseAuth.onAuthStateChanged(async (user) => {
@@ -710,8 +732,7 @@
                     this.isAuthProcessing = true; 
                     const cred = await firebaseAuth.createUserWithEmailAndPassword(email, pwd);
                     await cred.user.updateProfile({ displayName: name });
-                    const userRef = firebaseDb.collection('users').doc(cred.user.uid);
-                    await userRef.set({ email: email, realName: name, createdAt: firebase.firestore.FieldValue.serverTimestamp(), role: email === APP_CONFIG.creatorEmail ? 'creator' : 'user' });
+                    await firebaseDb.collection('users').doc(cred.user.uid).set({ email: email, realName: name, createdAt: firebase.firestore.FieldValue.serverTimestamp(), role: email === APP_CONFIG.creatorEmail ? 'creator' : 'user' });
                     await cred.user.sendEmailVerification(); await firebaseAuth.signOut();
                     this.showToast('註冊成功！請至信箱收取驗證信', 'success'); this.toggleAuthMode('login'); document.getElementById('login-email').value = email;
                 } catch (e) { this.showToast('註冊失敗：' + e.message, 'error'); } finally { this.isAuthProcessing = false; }
@@ -729,6 +750,7 @@
             
             async logout() { await firebaseAuth.signOut(); this.navigate('auth'); },
 
+            /* --- 附件處理 --- */
             async compressImage(file) {
                 return new Promise((resolve) => {
                     const reader = new FileReader(); reader.readAsDataURL(file);
@@ -739,9 +761,8 @@
                             if (w > h && w > MAX) { h *= MAX/w; w = MAX; } else if (h > MAX) { w *= MAX/h; h = MAX; }
                             const canvas = document.createElement('canvas'); canvas.width = w; canvas.height = h;
                             canvas.getContext('2d').drawImage(img, 0, 0, w, h);
-                            // 優先嘗試 WebP，如果瀏覽器不支援則會降級回 JPEG
                             let out = canvas.toDataURL('image/webp', 0.82);
-                            if (out.length >= e.target.result.length) out = e.target.result; // 若壓縮反而變大則不用
+                            if (out.length >= e.target.result.length) out = e.target.result; 
                             resolve({ data: out, mimeType: out.startsWith('data:image/webp') ? 'image/webp' : file.type });
                         };
                     };
@@ -752,10 +773,9 @@
                 const files = event.target.files; if (!files || files.length === 0) return;
                 for (let file of files) {
                     if (this.taskFiles.length >= 5) { this.showToast('最多上傳 5 個附件', 'warning'); break; }
-                    if (file.size > 15*1024*1024) { this.showToast(`檔案 ${file.name} 超過 15MB 上限`, 'error'); continue; }
+                    if (file.size > 15*1024*1024) { this.showToast(`檔案超過 15MB 上限`, 'error'); continue; }
                     
-                    let fName = file.name; if (fName.length > 20) fName = fName.substring(0,10) + '...' + fName.substring(fName.length-7);
-
+                    let fName = file.name.length > 20 ? file.name.substring(0,10) + '...' + file.name.substring(file.name.length-7) : file.name;
                     if (file.type.startsWith('image/')) {
                         this.showToast(`正在壓縮圖片...`, 'info');
                         const res = await this.compressImage(file);
@@ -765,7 +785,6 @@
                         reader.onload = (e) => { this.taskFiles.push({ name: fName, data: e.target.result, type: 'text' }); this.renderTaskFiles(); };
                         reader.readAsText(file); continue;
                     } else { 
-                        // PDF, 影片, 語音等
                         const reader = new FileReader();
                         reader.onload = (e) => { this.taskFiles.push({ name: fName, mimeType: file.type, data: e.target.result, type: 'inline' }); this.renderTaskFiles(); };
                         reader.readAsDataURL(file); continue;
@@ -775,20 +794,15 @@
                 event.target.value = '';
             },
 
-            removeTaskFile(index) {
-                this.taskFiles.splice(index, 1);
-                this.renderTaskFiles();
-            },
-
+            removeTaskFile(index) { this.taskFiles.splice(index, 1); this.renderTaskFiles(); },
             renderTaskFiles() {
                 const list = document.getElementById('file-preview-list'); list.innerHTML = '';
                 this.taskFiles.forEach((f, i) => {
-                    list.innerHTML += `<li class="flex justify-between items-center bg-slate-50 px-3 py-2 rounded-lg text-sm border border-slate-200 shadow-sm">
-                        <div class="flex items-center gap-2 text-slate-600"><i class="ph ${f.type==='inline'?'ph-file-image':'ph-file-text'}"></i><span>${f.name}</span></div>
-                        <button onclick="App.removeTaskFile(${i})" class="text-slate-400 hover:text-rose-500 transition"><i class="ph ph-trash"></i></button></li>`;
+                    list.innerHTML += `<li class="flex justify-between items-center bg-slate-50 px-3 py-2 rounded-lg text-sm border border-slate-200 shadow-sm"><div class="flex items-center gap-2 text-slate-600"><i class="ph ${f.type==='inline'?'ph-file-image':'ph-file-text'}"></i><span>${f.name}</span></div><button onclick="App.removeTaskFile(${i})" class="text-slate-400 hover:text-rose-500 transition"><i class="ph ph-trash"></i></button></li>`;
                 });
             },
 
+            /* --- 測驗流程 --- */
             async startQuestionnaire() {
                 const apiKey = this.getApiKey(); if (!apiKey) return;
                 
@@ -807,53 +821,59 @@
                 document.getElementById('q-content-state').classList.add('hidden');
                 document.getElementById('q-loading-state').classList.remove('hidden');
                 
-                // 動態提示文字
                 let texts = ["分析您的探索情境...", "評估合適測驗維度...", "啟動 Gemini 3.8 引擎..."]; let tIdx = 0;
                 const el = document.getElementById('q-loading-text'); el.textContent = texts[0];
                 if (this.qLoadingInterval) clearInterval(this.qLoadingInterval);
                 this.qLoadingInterval = setInterval(() => { el.style.opacity=0; setTimeout(()=>{ tIdx=(tIdx+1)%texts.length; el.textContent=texts[tIdx]; el.style.opacity=1;},400); }, 3000);
 
-                let attempt = 0;
-                while(attempt < 2) {
-                    try { 
-                        this.activeQuestions = await this.generateAIQuestions(apiKey); 
-                        if(!this.activeQuestions || this.activeQuestions.length < 3) throw new Error("題目產出數量不足");
-                        document.getElementById('q-content-state').classList.remove('hidden'); 
-                        this.renderQuestion(); 
-                        break; 
-                    } 
-                    catch (e) {
-                        attempt++;
-                        // 攔截到致命錯誤(400/401/403)時，立刻強制中止不必要的外部重試迴圈
-                        if (attempt >= 2 || e.message.includes('(400)') || e.message.includes('(401)') || e.message.includes('(403)')) {
-                            document.getElementById('q-error-state').classList.remove('hidden');
-                            document.getElementById('q-error-text').textContent = "系統防呆攔截：" + (e.message || '連線異常');
-                            attempt = 99; 
-                        }
-                    } finally { if(attempt>=2 || this.activeQuestions.length>0){ clearInterval(this.qLoadingInterval); document.getElementById('q-loading-state').classList.add('hidden');} }
+                try { 
+                    this.activeQuestions = await this.generateAIQuestions(apiKey); 
+                    if(!this.activeQuestions || this.activeQuestions.length < 3) throw new Error("題目產出數量異常");
+                    document.getElementById('q-content-state').classList.remove('hidden'); 
+                    this.renderQuestion(); 
+                } catch (e) {
+                    document.getElementById('q-error-state').classList.remove('hidden');
+                    document.getElementById('q-error-text').textContent = "系統防呆攔截：" + (e.message || '連線異常');
+                } finally { 
+                    clearInterval(this.qLoadingInterval); 
+                    document.getElementById('q-loading-state').classList.add('hidden');
                 }
             },
 
             async generateAIQuestions(apiKey) {
                 let lengthInstruction = "";
                 switch(this.currentTask.depthPreference) {
-                    case 'quick': lengthInstruction = "請產出剛好 6 題，適合快速評估。"; break;
-                    case 'standard': lengthInstruction = "請產出剛好 10 題，適合平衡深度的評估。"; break;
-                    case 'deep': lengthInstruction = "請產出剛好 15 題，適合全面且深度的剖析。"; break;
-                    case 'dynamic': default: lengthInstruction = "請您身為專家自行判斷，產出 8 到 12 題之間。"; break;
+                    case 'quick': lengthInstruction = "請產出剛好 6 題。"; break;
+                    case 'standard': lengthInstruction = "請產出剛好 10 題。"; break;
+                    case 'deep': lengthInstruction = "請產出剛好 15 題。"; break;
+                    case 'dynamic': default: lengthInstruction = "請產出 8 到 12 題之間。"; break;
                 }
 
-                const prompt = `您是一位頂尖的心理測驗設計師。請根據使用者提供的背景、探索目的與偏好，動態打造一份專屬的情境選擇題。
+                // 導入強結構化 Few-Shot Prompt，確保 JSON 解析穩定
+                const prompt = `您是一位頂尖的心理測驗設計師。請根據使用者提供的背景，動態打造一份專屬的情境選擇題。
 【探索對象】：${this.currentTask.target === 'self' ? '自己' : '其他人'}
 【探索目的】：${this.currentTask.purpose}
 【背景說明】：${this.currentTask.background || '無特殊說明'}
 【長度指示】：${lengthInstruction}
 
-【硬性輸出要求 (絕對嚴格遵守，攸關系統存亡)】：
-1. 格式：嚴格只輸出 JSON 陣列，不要加入任何引言、結語或 markdown 標籤。
-2. 內容安全：絕對禁止在 JSON 中使用半形雙引號 (") 作為對話或內容的引號，請一律使用單引號 (') 或全形字元（「」）。
-3. 資料結構範例：[{"id":"q1","text":"題目內容","options":[{"text":"選項一","type":"ENG"}]}]
-4. 選項 type 限填：ENG(互動), WARM(情感), ANA(分析), STR(結構), EXP(探索), RES(韌性)。每題必須有 4 個不同 type 的選項。`;
+【硬性輸出要求 (絕對嚴格遵守)】：
+1. 格式：嚴格只輸出 JSON 陣列 (Array)，絕對不要加入引言或 markdown (如 \`\`\`json)。
+2. 字元安全：絕對禁止在 JSON 中使用半形雙引號 (") 作為內容引號，請一律使用單引號 (') 或全形字元（「」）。
+3. 每個選項 type 限填：ENG(互動), WARM(情感), ANA(分析), STR(結構), EXP(探索), RES(韌性)。
+
+【Few-Shot 結構範例 (請嚴格對齊此結構)】：
+[
+  {
+    "id": "q1",
+    "text": "當團隊遇到前所未有的危機時，您的第一反應是？",
+    "options": [
+      { "text": "立刻安撫大家的情緒", "type": "WARM" },
+      { "text": "快速分析數據", "type": "ANA" },
+      { "text": "召集腦力激盪", "type": "EXP" },
+      { "text": "建立標準流程", "type": "STR" }
+    ]
+  }
+]`;
 
                 let parts = [{ text: prompt }];
                 this.taskFiles.forEach(f => {
@@ -865,16 +885,7 @@
                 const uiUpdater = (msg) => { const el = document.getElementById('q-loading-text'); if(el) el.textContent = msg; };
                 const data = await this.fetchGeminiWithRetry(APP_CONFIG.models.analysis, apiKey, payload, uiUpdater);
                 
-                let rawText = data.candidates[0].content.parts[0].text;
-                rawText = rawText.replace(/[\x00-\x1F]+/g, ""); // 拔除隱形控制字元
-                
-                try { return JSON.parse(rawText); } 
-                catch (e) {
-                    // 正則保護網：擷取陣列 []
-                    const match = rawText.match(/\[\s*\{[\s\S]*\}\s*\]/);
-                    if (match) return JSON.parse(match[0]);
-                    throw new Error("JSON 解析失敗，可能含有不合法字元。");
-                }
+                return this.robustJSONParse(data.candidates[0].content.parts[0].text, 'array');
             },
 
             fallbackToStandardQuestions() {
@@ -901,94 +912,122 @@
                 this.currentQuestionIndex++; this.renderQuestion();
             },
 
+            /* --- 報告生成核心 --- */
             async generateReport() {
                 const apiKey = this.getApiKey(); if (!apiKey) return;
                 this.navigate('result');
                 document.getElementById('res-main-content').classList.add('hidden'); document.getElementById('res-error-state').classList.add('hidden');
                 document.getElementById('res-ai-loading').classList.remove('hidden');
                 
-                let texts = ["整合作答軌跡...", "分析多模態附件...", "運用榮格心理學深度解析...", "建構專屬三重意象...", "撰寫完整行動建議報告..."]; let tIdx = 0;
+                let texts = ["整合作答軌跡...", "分析多模態附件...", "運用榮格心理學深度解析...", "建構專屬三重意象...", "繪製視覺情境中..."]; let tIdx = 0;
                 const el = document.getElementById('res-ai-loading-text'); el.textContent = texts[0];
                 if (this.rLoadingInterval) clearInterval(this.rLoadingInterval);
                 this.rLoadingInterval = setInterval(() => { el.style.opacity=0; setTimeout(()=>{ tIdx=(tIdx+1)%texts.length; el.textContent=texts[tIdx]; el.style.opacity=1;},400); }, 3500);
 
-                const prompt = `您是具備深厚榮格心理學與組織行為學底蘊的頂尖人格分析師。請根據使用者的背景、上傳資料與作答，產生繁體中文「三重意象分析報告」。
+                // 導入強結構化 Few-Shot Prompt，保證圖表 Prompt 與 Hex 色碼穩定輸出
+                const prompt = `您是具備深厚榮格心理學底蘊的頂尖分析師。請產生繁體中文「三重意象分析報告」。
 【探索對象】：${this.currentTask.target === 'self' ? '自己' : '其他人'}
 【探索目的】：${this.currentTask.purpose}
 【作答紀錄】：${JSON.stringify(this.currentTask.answers)}
 
 【硬性輸出要求 (嚴格遵守)】：
-1. 必須輸出純 JSON 物件，不含引言與 markdown 標籤。
-2. 包含欄位：reportTitle, oneLineIdentity, summary, color(含 name, meaning), animal(含 name, meaning), flower(含 name, meaning), integratedNarrative, strengths(陣列), watchouts(陣列), workAndLearning(陣列), actionPlan(陣列物件，含 action, reason), imageConceptZh, imagePromptEn, chartPromptEn。
-3. 字元安全：絕對禁止在內容中使用半形雙引號 (") 作為內容標點，請一律替換為全形（「」）或單引號。
-4. 視覺意象要求：
-   - imageConceptZh：用 80 字優美中文描述將這三個元素融合的「情境畫面」。
-   - imagePromptEn：將上述情境轉為精準的 Midjourney 英文提示詞。
-   - chartPromptEn：產生一段英文提示詞 (Prompt)，用於讓 AI 生成一張高質感的「綜合意象分析資訊圖表 (Infographic / Diagram)」。圖表中必須同時出現並解析「顏色」、「動物」與「植物」這三個元素。設計風格請指定為：modern infographic, clean UI/UX layout, data visualization, elegant flat design, psychological profile dashboard。`;
+1. 必須輸出純 JSON 物件，絕對不要出現 \`\`\`json 等 Markdown 標籤。
+2. 禁用半形雙引號 (") 作為內容標點。
+3. imageConceptZh：用 80 字優美中文描述這三個元素融合的情境畫面。
+4. imagePromptEn：將上述情境轉為精準的 Midjourney 英文提示詞 (Hyper-realistic)。
+5. chartPromptEn：產生一段用於生成「綜合意象分析資訊圖表 (Infographic Dashboard)」的英文提示詞。風格：modern infographic, clean UI/UX layout。須融合您的顏色、動物、植物元素。
+
+【Few-Shot 結構範例 (請嚴格對齊)】：
+{
+  "reportTitle": "深邃如海的戰略守護者",
+  "oneLineIdentity": "冷靜分析與強大韌性的完美結合",
+  "summary": "您展現出極高的分析力...",
+  "color": { "name": "深海靛藍", "hex": "#1E3A8A", "meaning": "象徵冷靜與智慧" },
+  "animal": { "name": "貓頭鷹", "meaning": "洞察先機的智者" },
+  "flower": { "name": "松樹", "meaning": "不畏嚴寒的韌性" },
+  "integratedNarrative": "當深海靛藍的光芒照耀...",
+  "strengths": ["精準分析", "情緒控管"],
+  "watchouts": ["過度追求完美"],
+  "workAndLearning": ["建議安排專注時段"],
+  "actionPlan": [ { "action": "晨間覆盤", "reason": "穩定心流" } ],
+  "imageConceptZh": "在靛藍色星空下，一隻智慧的貓頭鷹棲息在古老的松樹上。",
+  "imagePromptEn": "A hyper-realistic photography of a wise owl perched on a sturdy ancient pine tree, illuminated by a deep indigo starry night sky, cinematic lighting, 8k --ar 2:1",
+  "chartPromptEn": "A modern psychological infographic dashboard featuring a color palette based on deep indigo, illustrating an owl and a pine tree. Clean UI/UX layout, elegant data visualization."
+}`;
 
                 let parts = [{ text: prompt }];
-                if (this.taskFiles && this.taskFiles.length > 0) {
+                if (this.taskFiles.length > 0) {
                     this.taskFiles.forEach(f => {
                         if (f.type === 'inline') parts.push({ inlineData: { mimeType: f.mimeType, data: f.data.split(',')[1] } });
                         else parts.push({ text: `【附件 ${f.name}】\n${f.data}` });
                     });
                 }
 
-                let attempt = 0;
-                while (attempt < 2) {
-                    try {
-                        const payload = { contents: [{ parts: parts }], generationConfig: { responseMimeType: "application/json", maxOutputTokens: 8192 } };
-                        const uiUpdater = (msg) => { const el = document.getElementById('res-ai-loading-text'); if(el) el.textContent = msg; };
-                        const data = await this.fetchGeminiWithRetry(APP_CONFIG.models.analysis, apiKey, payload, uiUpdater);
-                        
-                        let rawText = data.candidates[0].content.parts[0].text;
-                        rawText = rawText.replace(/[\x00-\x1F]+/g, ""); 
-                        
-                        try { this.currentReport = JSON.parse(rawText); } 
-                        catch (e) {
-                            const match = rawText.match(/\{\s*"reportTitle"[\s\S]*\}/);
-                            if (match) this.currentReport = JSON.parse(match[0]);
-                            else throw new Error("JSON 格式嚴重損毀");
-                        }
-                        
-                        clearInterval(this.rLoadingInterval);
-                        this.renderReport(this.currentReport);
-                        document.getElementById('res-ai-loading').classList.add('hidden'); document.getElementById('res-main-content').classList.remove('hidden');
-                        this.initChat();
-                        
-                        if (this.currentUser) {
-                            await firebaseDb.collection('users').doc(this.currentUser.uid).collection('tasks').doc(this.currentTask.id).set({
-                                title: this.currentTask.title, createdAt: firebase.firestore.FieldValue.serverTimestamp(), report: this.currentReport
+                try {
+                    const payload = { contents: [{ parts: parts }], generationConfig: { responseMimeType: "application/json", maxOutputTokens: 8192 } };
+                    const uiUpdater = (msg) => { const el = document.getElementById('res-ai-loading-text'); if(el) el.textContent = msg; };
+                    const data = await this.fetchGeminiWithRetry(APP_CONFIG.models.analysis, apiKey, payload, uiUpdater);
+                    
+                    this.currentReport = this.robustJSONParse(data.candidates[0].content.parts[0].text, 'object');
+                    
+                    // --- 零崩潰即時繪圖與壓縮上傳邏輯 ---
+                    if (this.currentUser) {
+                        try {
+                            const uiUpdaterImg = (msg) => { const el = document.getElementById('res-ai-loading-text'); if(el) el.textContent = msg; };
+                            uiUpdaterImg("正在繪製並壓縮專屬情境圖...");
+                            const sceneUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(this.currentReport.imagePromptEn || 'Beautiful abstract artistic psychological landscape')}?width=1024&height=512&nologo=true`;
+                            const imgRes = await fetch(sceneUrl);
+                            const imgBlob = await imgRes.blob();
+                            
+                            // 利用前端 Canvas 將原始圖壓縮為 WebP
+                            const compressedImgData = await new Promise((resolve) => {
+                                const reader = new FileReader(); reader.readAsDataURL(imgBlob);
+                                reader.onload = (e) => {
+                                    const img = new Image(); img.src = e.target.result;
+                                    img.onload = () => {
+                                        const canvas = document.createElement('canvas'); canvas.width = 1024; canvas.height = 512;
+                                        canvas.getContext('2d').drawImage(img, 0, 0, 1024, 512);
+                                        resolve(canvas.toDataURL('image/webp', 0.8)); // 80% 品質壓縮
+                                    };
+                                };
                             });
+                            
+                            // 上傳至 Firebase Storage
+                            const storageRef = firebase.storage().ref();
+                            const imageRef = storageRef.child(`users/${this.currentUser.uid}/tasks/${this.currentTask.id}_scene.webp`);
+                            await imageRef.putString(compressedImgData.split(',')[1], 'base64', { contentType: 'image/webp' });
+                            
+                            this.currentReport.sceneImgUrl = await imageRef.getDownloadURL();
+                        } catch (imgErr) {
+                            console.warn("生圖或上傳失敗，改採即時渲染 fallback", imgErr);
+                            // 若上傳失敗，保留網址供即時渲染
                         }
-                        return;
-                    } catch (e) { 
-                        attempt++; 
-                        // 攔截到致命錯誤(400/401/403)時，立即跳出不再浪費 API 額度
-                        if(attempt>=2 || e.message.includes('(400)') || e.message.includes('(401)') || e.message.includes('(403)')) { 
-                            clearInterval(this.rLoadingInterval); 
-                            document.getElementById('res-ai-loading').classList.add('hidden'); 
-                            document.getElementById('res-error-state').classList.remove('hidden'); 
-                            document.getElementById('res-error-text').textContent = "系統防呆攔截：" + e.message; 
-                            break; 
-                        } 
                     }
+
+                    clearInterval(this.rLoadingInterval);
+                    this.renderReport(this.currentReport);
+                    document.getElementById('res-ai-loading').classList.add('hidden'); document.getElementById('res-main-content').classList.remove('hidden');
+                    this.initChat();
+                    
+                    if (this.currentUser) {
+                        await firebaseDb.collection('users').doc(this.currentUser.uid).collection('tasks').doc(this.currentTask.id).set({
+                            title: this.currentTask.title, createdAt: firebase.firestore.FieldValue.serverTimestamp(), report: this.currentReport
+                        });
+                    }
+                } catch (e) { 
+                    clearInterval(this.rLoadingInterval); 
+                    document.getElementById('res-ai-loading').classList.add('hidden'); 
+                    document.getElementById('res-error-state').classList.remove('hidden'); 
+                    document.getElementById('res-error-text').textContent = e.message; 
                 }
             },
 
             renderReport(r) {
-                // 安全防呆：確保 hex 存在，否則給予預設值
                 const hexColor = r.color?.hex || '#64748b';
-                
-                // 【核心升級】運用免 Key 且絕對穩定的 URL 渲染引擎，即時產生真實照片！
-                // 1. 真實動物頭像 (國家地理風格)
                 const animalUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent('Highly detailed realistic national geographic portrait photography of ' + (r.animal?.name || 'animal') + ', solid white background')}?width=256&height=256&nologo=true`;
-                // 2. 真實植物微距照 (植物圖鑑風格)
                 const plantUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent('Highly detailed realistic macro photography of ' + (r.flower?.name || 'plant') + ', solid white background')}?width=256&height=256&nologo=true`;
-                // 3. 結合三大元素的巨幅情境圖 (讀取自 AI 剛剛為您量身打造的英文 Prompt)
-                const sceneUrl = `https://image.pollinations.ai/prompt/${encodeURIComponent(r.imagePromptEn || 'Beautiful abstract artistic psychological landscape')}?width=1024&height=512&nologo=true`;
+                const sceneUrl = r.sceneImgUrl || `https://image.pollinations.ai/prompt/${encodeURIComponent(r.imagePromptEn || 'Beautiful abstract landscape')}?width=1024&height=512&nologo=true`;
 
-                // 左側面板：將原本的 Emoji 替換為「真實攝影圖片」
                 document.getElementById('res-summary-badges').innerHTML = `
                     <div class="flex items-start gap-4">
                         <div class="w-14 h-14 rounded-full flex items-center justify-center shrink-0 shadow-sm border-2 border-white ring-2 ring-slate-100" style="background-color: ${hexColor}20;">
@@ -1002,7 +1041,6 @@
                     </div>
                     <div class="flex items-start gap-4 mt-6">
                         <div class="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center shrink-0 shadow-sm border-2 border-white ring-2 ring-amber-100 overflow-hidden relative">
-                            <i class="ph ph-spinner-gap ph-spin text-slate-400 absolute z-0 text-xl"></i>
                             <img src="${animalUrl}" class="w-full h-full object-cover absolute inset-0 z-10 fade-in" alt="${r.animal?.name}">
                         </div>
                         <div>
@@ -1013,7 +1051,6 @@
                     </div>
                     <div class="flex items-start gap-4 mt-6">
                         <div class="w-14 h-14 rounded-full bg-slate-100 flex items-center justify-center shrink-0 shadow-sm border-2 border-white ring-2 ring-emerald-100 overflow-hidden relative">
-                            <i class="ph ph-spinner-gap ph-spin text-slate-400 absolute z-0 text-xl"></i>
                             <img src="${plantUrl}" class="w-full h-full object-cover absolute inset-0 z-10 fade-in" alt="${r.flower?.name}">
                         </div>
                         <div>
@@ -1029,13 +1066,12 @@
                 if (r.workAndLearning?.length) { md += `### 💼 職場與人際建議\n`; r.workAndLearning.forEach(w => md += `- ${w}\n`); md += `\n`; }
                 if (r.actionPlan?.length) { md += `### 🚀 專屬行動計畫\n`; r.actionPlan.forEach(act => md += `- **${act.action}**：${act.reason}\n`); }
 
-                // 【核心升級】將融合三大元素的「巨幅情境圖」安插在報告最上方
                 const loaderId = 'loader-' + Date.now();
                 const heroImageHtml = `
                     <div class="mb-8 rounded-2xl overflow-hidden shadow-sm border border-slate-100 bg-slate-50 relative aspect-[2/1] group">
                         <div id="${loaderId}" class="absolute inset-0 flex flex-col items-center justify-center text-slate-400 z-0 bg-slate-50">
                             <i class="ph ph-image text-4xl mb-3 animate-pulse"></i>
-                            <span class="text-sm font-medium tracking-wider">AI 正在即時繪製三大元素融合情境...</span>
+                            <span class="text-sm font-medium tracking-wider">AI 正在載入三大元素融合情境...</span>
                         </div>
                         <img src="${sceneUrl}" class="w-full h-full object-cover absolute inset-0 z-10 opacity-0 transition-opacity duration-1000 ease-in-out" alt="專屬意象情境圖" onload="document.getElementById('${loaderId}').style.display='none'; this.style.opacity=1;">
                         <div class="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-slate-900/80 to-transparent p-5 z-20 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -1043,18 +1079,17 @@
                         </div>
                     </div>`;
 
-                // 將圖片與 Markdown 分析報告結合並渲染
                 document.getElementById('res-ai-content').innerHTML = heroImageHtml + marked.parse(md);
                 document.getElementById('prompt-zh').value = r.imageConceptZh || '未產生中文構想';
                 document.getElementById('prompt-en').value = r.imagePromptEn || '未產生英文提示詞';
                 document.getElementById('chart-prompt-en').value = r.chartPromptEn || '未產生圖表提示詞';
             },
 
+            /* --- 互動功能與工具 --- */
             async fallbackCopyTextToClipboard(text) {
                 var textArea = document.createElement("textarea");
                 textArea.value = text; textArea.style.top = "0"; textArea.style.left = "0"; textArea.style.position = "fixed";
-                document.body.appendChild(textArea);
-                textArea.focus(); textArea.select();
+                document.body.appendChild(textArea); textArea.focus(); textArea.select();
                 try {
                     if (document.execCommand('copy')) this.showToast('已複製！', 'success');
                     else this.showToast('請手動選取複製', 'warning');
@@ -1073,10 +1108,8 @@
                 if (!this.currentReport) return this.showToast('尚無報告', 'error'); 
                 this.showToast('產生 Word 中...', 'info');
                 try {
-                    const r = this.currentReport; 
-                    const safeStr = (val) => String(val || '無資料');
+                    const r = this.currentReport; const safeStr = (val) => String(val || '無資料');
                     const safeList = (arr) => (!arr || !Array.isArray(arr) || arr.length === 0) ? '<li>無相關資料</li>' : arr.map(item => `<li style="margin-bottom: 8px;">${String(item)}</li>`).join('');
-
                     const htmlContent = `
                         <html xmlns:o='urn:schemas-microsoft-com:office:office' xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
                         <head><meta charset='utf-8'><title>${this.currentTask?.title || "Persona Bloom"}</title>
@@ -1092,7 +1125,6 @@
                             <h2>💼 職場與人際建議</h2><ul>${safeList(r.workAndLearning)}</ul>
                             <h2>🚀 專屬行動計畫</h2><ul>${safeList(r.actionPlan?.map(a => `<b>${a.action || '建議'}</b>: ${a.reason || '說明'}`))}</ul>
                         </body></html>`;
-
                     const blob = new Blob(['\ufeff', htmlContent], { type: 'application/msword' });
                     const url = URL.createObjectURL(blob);
                     const a = document.createElement('a'); a.href = url; a.download = `PersonaBloom_報告_${Date.now()}.doc`;
@@ -1105,8 +1137,7 @@
                 if (!this.currentReport) return; const apiKey = this.getApiKey(); if (!apiKey) return;
                 const btn = document.getElementById('btn-fb-post'); const oriHtml = btn.innerHTML; btn.innerHTML = '<i class="ph ph-spinner ph-spin mr-1"></i>生成中...';
                 try {
-                    const pt = `你是一位擅長社群行銷的專家。請為使用者的「三重意象分析」撰寫 Facebook 貼文。\n\n【要求】：\n1. 用第一人稱（我），活潑、驚喜、使用 Emoji。\n2. 結構：破冰 -> 秀出意象「${this.currentReport.oneLineIdentity}」 -> 巧妙串連「${this.currentReport.color?.name}、${this.currentReport.animal?.name}、${this.currentReport.flower?.name}」並點評最準的特質 -> 結尾問句互動。\n3. 加上 #PersonaBloom #三重意象探索\n4. 約 150 字，舒適換行。勿提 AI 或 JSON。\n\n報告參考：${JSON.stringify(this.currentReport)}`;
-                    
+                    const pt = `你是一位擅長社群行銷的專家。請為使用者的「三重意象分析」撰寫 Facebook 貼文。\n要求：用第一人稱（我），活潑、驚喜、使用 Emoji。結構：破冰 -> 秀出意象「${this.currentReport.oneLineIdentity}」 -> 巧妙串連「${this.currentReport.color?.name}、${this.currentReport.animal?.name}、${this.currentReport.flower?.name}」並點評最準的特質。加上 #PersonaBloom。約 150 字。\n報告參考：${JSON.stringify(this.currentReport)}`;
                     const payload = { contents: [{ parts: [{ text: pt }] }] };
                     const uiUpdater = (msg) => { btn.innerHTML = `<i class="ph ph-spinner ph-spin mr-1"></i>${msg}`; };
                     const data = await this.fetchGeminiWithRetry(APP_CONFIG.models.analysis, apiKey, payload, uiUpdater);
@@ -1126,7 +1157,6 @@
                 const btn = document.getElementById('btn-tts'); const oriHtml = btn.innerHTML; btn.innerHTML = '<i class="ph ph-spinner-gap ph-spin mr-2 text-lg"></i>AI 語音生成中...'; btn.disabled = true;
                 try {
                     const text = `您的專屬意象是：${this.currentReport.oneLineIdentity}。${this.currentReport.summary}`;
-                    
                     const payload = { contents: [{ parts: [{ text: text }] }], generationConfig: { responseModalities: ["AUDIO"] } };
                     const uiUpdater = (msg) => { btn.innerHTML = `<i class="ph ph-spinner-gap ph-spin mr-2 text-lg"></i>${msg}`; };
                     const data = await this.fetchGeminiWithRetry(APP_CONFIG.models.tts, apiKey, payload, uiUpdater);
@@ -1166,7 +1196,6 @@
                 cont.scrollTop = cont.scrollHeight; this.chatHistory.push({ role: "user", parts: [{ text: txt }] });
                 try {
                     const sys = `你是一位專業同理的心理教練。請根據報告提供建議。\n報告：${JSON.stringify(this.currentReport)}`;
-                    
                     const payload = { contents: this.chatHistory, systemInstruction: { parts: [{ text: sys }] } };
                     const uiUpdater = (msg) => { const el = document.getElementById(lId); if (el) el.querySelector('div').innerHTML = `<i class="ph ph-spinner-gap ph-spin text-lg"></i> ${msg}`; };
                     const data = await this.fetchGeminiWithRetry(APP_CONFIG.models.chat, apiKey, payload, uiUpdater);
@@ -1193,6 +1222,7 @@
                 } catch (err) { this.showToast('傳送失敗', 'error'); e.currentTarget.innerHTML = '送出回饋'; }
             },
 
+            /* --- 歷史與管理員 --- */
             async loadHistory() {
                 if (!this.currentUser) return; const list = document.getElementById('history-list');
                 list.innerHTML = '<div class="text-center text-slate-500 py-10"><i class="ph ph-spinner ph-spin text-3xl mb-2"></i></div>';
@@ -1203,7 +1233,7 @@
                     snap.forEach(doc => {
                         const data = doc.data(); data.id = doc.id; this.historyData.push(data);
                         let dateStr = data.createdAt && typeof data.createdAt.toDate === 'function' ? data.createdAt.toDate().toLocaleString() : '-';
-                        let safeTitle = (data.title || '').replace(/'/g, "\\'"); // 防呆單引號
+                        let safeTitle = (data.title || '').replace(/'/g, "\\'");
                         html += `<div class="bg-white p-5 rounded-xl border border-slate-100 shadow-sm flex justify-between items-center hover:shadow-md transition">
                                 <div><div class="font-bold text-slate-800 text-lg mb-1">${data.title}</div><div class="text-sm text-slate-500"><i class="ph ph-clock mr-1"></i>${dateStr}</div></div>
                                 <div class="flex gap-2">
@@ -1218,19 +1248,13 @@
 
             async deleteHistory(taskId) {
                 this.showCustomModal({
-                    title: '<i class="ph-fill ph-warning-circle text-rose-500 mr-2"></i>確認刪除',
-                    desc: '您確定要刪除這筆探索紀錄嗎？此動作無法復原。',
-                    confirmText: '確定刪除',
-                    confirmColor: 'bg-rose-600 hover:bg-rose-700',
+                    title: '<i class="ph-fill ph-warning-circle text-rose-500 mr-2"></i>確認刪除', desc: '您確定要刪除這筆探索紀錄嗎？此動作無法復原。',
+                    confirmText: '確定刪除', confirmColor: 'bg-rose-600 hover:bg-rose-700',
                     onConfirm: async () => {
                         try {
-                            // 1. 刪除 Firestore 文字紀錄
                             await firebaseDb.collection('users').doc(this.currentUser.uid).collection('tasks').doc(taskId).delete();
-                            // 2. 靜默刪除 Storage 雲端圖片，清出空間
                             try { await firebase.storage().ref(`users/${this.currentUser.uid}/tasks/${taskId}_scene.webp`).delete(); } catch(e){}
-                            
-                            this.showToast('紀錄與雲端圖片已成功刪除', 'success');
-                            this.loadHistory(); 
+                            this.showToast('紀錄與雲端圖片已成功刪除', 'success'); this.loadHistory(); 
                         } catch (e) { this.showToast('刪除失敗', 'error'); }
                     }
                 });
@@ -1238,18 +1262,13 @@
 
             async renameHistory(taskId, currentTitle) {
                 this.showCustomModal({
-                    title: '<i class="ph-fill ph-pencil-simple text-blue-500 mr-2"></i>修改專案名稱',
-                    desc: '請輸入新的報告名稱：',
-                    requireInput: true,
-                    defaultValue: currentTitle,
-                    confirmText: '儲存變更',
-                    confirmColor: 'bg-blue-600 hover:bg-blue-700',
+                    title: '<i class="ph-fill ph-pencil-simple text-blue-500 mr-2"></i>修改專案名稱', desc: '請輸入新的報告名稱：',
+                    requireInput: true, defaultValue: currentTitle, confirmText: '儲存變更', confirmColor: 'bg-blue-600 hover:bg-blue-700',
                     onConfirm: async (newTitle) => {
                         if (!newTitle) return this.showToast('名稱不能為空', 'warning');
                         try {
                             await firebaseDb.collection('users').doc(this.currentUser.uid).collection('tasks').doc(taskId).update({ title: newTitle });
-                            this.showToast('名稱已更新', 'success');
-                            this.loadHistory(); 
+                            this.showToast('名稱已更新', 'success'); this.loadHistory(); 
                         } catch (e) { this.showToast('更新失敗', 'error'); }
                     }
                 });
@@ -1298,26 +1317,14 @@
                 const m = document.getElementById('custom-modal');
                 document.getElementById('custom-modal-title').innerHTML = opt.title; document.getElementById('custom-modal-desc').innerHTML = opt.desc;
                 const ic = document.getElementById('custom-modal-input-container'); const ie = document.getElementById('custom-modal-input');
-                
-                // 處理 Enter 鍵直接觸發送出
                 ie.onkeypress = (e) => { if (e.key === 'Enter') document.getElementById('custom-modal-confirm').click(); };
-
-                if (opt.requireInput) { 
-                    ic.classList.remove('hidden'); 
-                    ie.value = opt.defaultValue || ''; 
-                    ie.placeholder = opt.placeholder || ''; 
-                    setTimeout(() => ie.focus(), 100);
-                } else { ic.classList.add('hidden'); ie.value = ''; }
-                
+                if (opt.requireInput) { ic.classList.remove('hidden'); ie.value = opt.defaultValue || ''; ie.placeholder = opt.placeholder || ''; setTimeout(() => ie.focus(), 100); } 
+                else { ic.classList.add('hidden'); ie.value = ''; }
                 const hc = document.getElementById('custom-modal-html-container');
                 if (opt.htmlContent) { hc.classList.remove('hidden'); hc.innerHTML = opt.htmlContent; } else hc.classList.add('hidden');
-                
                 const btn = document.getElementById('custom-modal-confirm');
                 btn.className = `px-5 py-2.5 rounded-xl font-bold transition text-white shadow-md ${opt.confirmColor}`; btn.innerHTML = opt.confirmText;
-                btn.onclick = () => { 
-                    m.classList.add('hidden'); 
-                    if (opt.onConfirm) opt.onConfirm(ie.value.trim()); 
-                };
+                btn.onclick = () => { m.classList.add('hidden'); if (opt.onConfirm) opt.onConfirm(ie.value.trim()); };
                 m.classList.remove('hidden');
             }
         };
